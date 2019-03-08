@@ -62,28 +62,13 @@ public class SearchEarthquakesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search_earthquakes, container, false);
 
-        final FragmentManager fm = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
-
-        final FrameLayout searchResultsContainer = view.findViewById(R.id.searchResultsContainer);
-        if (searchResultsContainer != null) {
-            // In landscape mode
-        }
-
         Button buttonSearch = view.findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Date start = new Date();
                 Date end = new Date();
-
-                // If contain doesn't exist tell main activity to launch activity, otherwise we
-                // should it ourselves in a fragment.
-                if (searchResultsContainer == null) {
-                    mListener.onSearchEarthquakes(start, end);
-                } else {
-                    Fragment fragment = SearchResultsFragment.newInstance(start, end);
-                    fm.beginTransaction().replace(R.id.searchResultsContainer, fragment).commitNow();
-                }
+                mListener.onSearchEarthquakes(start, end);
             }
         });
 

@@ -1,6 +1,7 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
         setSupportActionBar(toolbar);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mSectionsPagerAdapter.addPage(SearchEarthquakesFragment.newInstance(), "Search");
+        mSectionsPagerAdapter.addPage(SearchContainerFragment.newInstance(), "Search");
         mSectionsPagerAdapter.addPage(EarthquakeListFragment.newInstance(), "List");
         mSectionsPagerAdapter.addPage(EarthquakeMapFragment.newInstance(), "Map");
 
@@ -67,14 +68,23 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
-        Intent intent = SearchResultsActivity.newInstance(this, start, end);
-        startActivity(intent);
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            SearchContainerFragment fragment = (SearchContainerFragment)mSectionsPagerAdapter.getFragment("search");
+            fragment.searchEarthquakes(start, end);
+        } else {
+            Intent intent = SearchResultsActivity.newInstance(this, start, end);
+            startActivity(intent);
+        }
     }
 
     @Override
     public void onEarthquakeSelected(long id) {
-        Intent intent = EarthquakeDetailActivity.newInstance(this, id);
-        startActivity(intent);
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Intent intent = EarthquakeDetailActivity.newInstance(this, id);
+            startActivity(intent);
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -102,6 +112,15 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
         @Override
         public int getCount() {
             return mPageList.size();
+        }
+
+        public Fragment getFragment(String title) {
+            for (Page page : mPageList) {
+                if (page.title.equalsIgnoreCase(title)) {
+                    return page.fragment;
+                }
+            }
+            return null;
         }
 
         private class Page {

@@ -18,8 +18,12 @@ public class SearchResultsFragment extends Fragment {
     private Date mStartDate;
     private Date mEndDate;
 
+    public static SearchResultsFragment newInstance() {
+        return new SearchResultsFragment();
+    }
+
     public static SearchResultsFragment newInstance(Date start, Date end) {
-        SearchResultsFragment fragment = new SearchResultsFragment();
+        SearchResultsFragment fragment = newInstance();
         Bundle args = new Bundle();
         args.putLong(ARG_START_TIME, start.getTime());
         args.putLong(ARG_END_TIME, end.getTime());
@@ -57,6 +61,10 @@ public class SearchResultsFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    void updateSearchResults(Date start, Date end) {
+
     }
 
     public interface OnFragmentInteractionListener {
