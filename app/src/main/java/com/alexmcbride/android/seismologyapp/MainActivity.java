@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener, SearchResultsFragment.OnFragmentInteractionListener, EarthquakeListFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener,
+        SearchResultsFragment.OnFragmentInteractionListener,
+        EarthquakeListFragment.OnFragmentInteractionListener,
+        EarthquakeDetailFragment.OnFragmentInteractionListener{
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 

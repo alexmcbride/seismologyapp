@@ -3,6 +3,7 @@ package com.alexmcbride.android.seismologyapp;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -29,10 +30,9 @@ public class EarthquakeDetailActivity extends AppCompatActivity implements Earth
                     .replace(R.id.container, fragment)
                     .commitNow();
         }
-    }
 
-    @Override
-    public void onBack() {
-        finish();
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Earthquake Detail");
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 }

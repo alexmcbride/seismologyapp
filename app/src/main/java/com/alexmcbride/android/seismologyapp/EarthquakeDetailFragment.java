@@ -25,12 +25,7 @@ public class EarthquakeDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_detail, container, false);
-        view.findViewById(R.id.buttonBack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onBack();
-            }
-        });
+
         return view;
     }
 
@@ -59,6 +54,6 @@ public class EarthquakeDetailFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onBack();
+
     }
 }
