@@ -14,7 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+
 import java.util.Date;
 import java.util.List;
 
@@ -68,8 +69,7 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             SearchContainerFragment fragment = (SearchContainerFragment)mSectionsPagerAdapter.getFragment("search");
             fragment.searchEarthquakes(start, end);
         } else {
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
         }
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        private List<Page> mPageList = new ArrayList<>();
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private List<Page> mPageList = Lists.newArrayList();
 
         SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
             return mPageList.size();
         }
 
-        public Fragment getFragment(String title) {
+        Fragment getFragment(String title) {
             for (Page page : mPageList) {
                 if (page.title.equalsIgnoreCase(title)) {
                     return page.fragment;

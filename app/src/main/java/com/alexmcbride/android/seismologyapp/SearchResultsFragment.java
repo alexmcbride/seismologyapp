@@ -64,7 +64,7 @@ public class SearchResultsFragment extends Fragment {
     }
 
     void updateSearchResults(Date start, Date end) {
-
+        // update ui
     }
 
     public interface OnFragmentInteractionListener {
