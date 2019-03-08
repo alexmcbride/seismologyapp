@@ -7,6 +7,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.util.Objects;
+
 public class EarthquakeDetailActivity extends AppCompatActivity implements EarthquakeDetailFragment.OnFragmentInteractionListener {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
 
@@ -32,7 +34,7 @@ public class EarthquakeDetailActivity extends AppCompatActivity implements Earth
         }
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Earthquake Detail");
+        Objects.requireNonNull(actionBar).setTitle("Earthquake Detail");
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 }

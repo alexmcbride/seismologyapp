@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import java.util.Objects;
+
 public class EarthquakeListFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
@@ -26,7 +28,7 @@ public class EarthquakeListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_list, container, false);
 
-        final FragmentManager fm = getActivity().getSupportFragmentManager();
+        final FragmentManager fm = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
         final FrameLayout earthquakeDetailsContainer = view.findViewById(R.id.earthquakeDetailsContainer);
 
         Button buttonEarthquakeSelected = view.findViewById(R.id.buttonEarthquakeSelected);
