@@ -10,23 +10,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class SearchResultsFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+import java.util.Date;
 
-    public static SearchResultsFragment newInstance() {
-        return new SearchResultsFragment();
+public class SearchResultsFragment extends Fragment {
+    private static final String ARG_START_TIME = "ARG_START_TIME";
+    private static final String ARG_END_TIME = "ARG_END_TIME";
+    private OnFragmentInteractionListener mListener;
+    private Date mStartDate;
+    private Date mEndDate;
+
+    public static SearchResultsFragment newInstance(Date start, Date end) {
+        SearchResultsFragment fragment = new SearchResultsFragment();
+        Bundle args = new Bundle();
+        args.putLong(ARG_START_TIME, start.getTime());
+        args.putLong(ARG_END_TIME, end.getTime());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mStartDate = new Date(getArguments().getLong(ARG_START_TIME));
+            mEndDate = new Date(getArguments().getLong(ARG_START_TIME));
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
-        view.findViewById(R.id.buttonBack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onBack();
-            }
-        });
+
         return view;
     }
 
@@ -46,7 +61,6 @@ public class SearchResultsFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onBack();
+
     }
 }

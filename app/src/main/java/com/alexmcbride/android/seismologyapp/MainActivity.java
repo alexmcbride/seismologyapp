@@ -1,7 +1,6 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener, EarthquakeListFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener, SearchResultsFragment.OnFragmentInteractionListener, EarthquakeListFragment.OnFragmentInteractionListener {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
-        Intent intent = SearchResultsActivity.newInstance(this);
+        Intent intent = SearchResultsActivity.newInstance(this, start, end);
         startActivity(intent);
     }
 
