@@ -20,7 +20,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener,
         SearchResultsFragment.OnFragmentInteractionListener,
         EarthquakeListFragment.OnFragmentInteractionListener,
-        EarthquakeDetailFragment.OnFragmentInteractionListener{
+        EarthquakeDetailFragment.OnFragmentInteractionListener,
+        EarthquakeMapFragment.OnFragmentInteractionListener {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mSectionsPagerAdapter.addPage(SearchEarthquakesFragment.newInstance(), "Search");
         mSectionsPagerAdapter.addPage(EarthquakeListFragment.newInstance(), "List");
+        mSectionsPagerAdapter.addPage(EarthquakeMapFragment.newInstance(), "Map");
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
