@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import java.util.Date;
 
 public class SearchContainerFragment extends Fragment {
+    private SearchEarthquakesFragment searchEarthquakesFragment;
     private SearchResultsFragment searchResultsFragment;
     private OnFragmentInteractionListener mListener;
 
@@ -25,18 +26,42 @@ public class SearchContainerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_search_container, container, false);
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save state of child fragments
+        saveFragmentState(searchEarthquakesFragment, outState);
+        saveFragmentState(searchResultsFragment, outState);
+    }
+
+    private void saveFragmentState(FragmentState fragmentState, Bundle outState) {
+        if (fragmentState != null) {
+            Bundle state = fragmentState.getSavedState();
+            outState.putAll(state);
+        }
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        searchEarthquakesFragment = SearchEarthquakesFragment.newInstance();
+        searchResultsFragment = SearchResultsFragment.newInstance();
+
+        // Load state of child fragments.
+        if (savedInstanceState != null) {
+            searchEarthquakesFragment.setSavedState(savedInstanceState);
+            searchResultsFragment.setSavedState(savedInstanceState);
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_search_container, container, false);
 
         final boolean hasDetailContainer = view.findViewById(R.id.detailContainer) != null;
         final FragmentManager fm = getChildFragmentManager();
 
-        SearchEarthquakesFragment searchEarthquakesFragment = SearchEarthquakesFragment.newInstance();
         searchEarthquakesFragment.setListener(new SearchEarthquakesFragment.OnFragmentInteractionListener() {
             @Override
             public void onSearchEarthquakes(Date start, Date end) {
@@ -50,9 +75,10 @@ public class SearchContainerFragment extends Fragment {
         fm.beginTransaction().replace(R.id.masterContainer, searchEarthquakesFragment).commitNow();
 
         if (hasDetailContainer) {
-            searchResultsFragment = SearchResultsFragment.newInstance();
             fm.beginTransaction().replace(R.id.detailContainer, searchResultsFragment).commitNow();
         }
+
+        return view;
     }
 
     @Override

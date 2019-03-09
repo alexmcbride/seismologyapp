@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 public class ListContainerFragment extends Fragment {
     private EarthquakeDetailFragment mEarthquakeDetailFragment;
     private OnFragmentInteractionListener mListener;
+    private EarthquakeListFragment earthquakeListFragment;
 
     public ListContainerFragment() {
         // Required
@@ -20,6 +21,16 @@ public class ListContainerFragment extends Fragment {
 
     public static ListContainerFragment newInstance() {
         return new ListContainerFragment();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -34,7 +45,7 @@ public class ListContainerFragment extends Fragment {
         final boolean hasDetailContainer = view.findViewById(R.id.detailContainer) != null;
         final FragmentManager fm = getChildFragmentManager();
 
-        EarthquakeListFragment earthquakeListFragment = EarthquakeListFragment.newInstance();
+        earthquakeListFragment = EarthquakeListFragment.newInstance();
         earthquakeListFragment.setListener(new EarthquakeListFragment.OnFragmentInteractionListener() {
             @Override
             public void onEarthquakeSelected(long id) {

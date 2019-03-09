@@ -1,6 +1,5 @@
 package com.alexmcbride.android.seismologyapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.Date;
 
-public class SearchResultsFragment extends Fragment {
+public class SearchResultsFragment extends Fragment implements FragmentState {
     private static final String ARG_START_TIME = "ARG_START_TIME";
     private static final String ARG_END_TIME = "ARG_END_TIME";
     private Date mStartDate;
@@ -46,6 +45,9 @@ public class SearchResultsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
         textView = view.findViewById(R.id.textView);
+        if (mStartDate != null && mEndDate != null) {
+            textView.setText("Start: " + mStartDate.toString() + " End: " + mEndDate.toString());
+        }
         return view;
     }
 
@@ -57,5 +59,15 @@ public class SearchResultsFragment extends Fragment {
     void updateSearchResults(Date start, Date end) {
         // update ui
         textView.setText("Updated");
+    }
+
+    @Override
+    public void setSavedState(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    public Bundle getSavedState() {
+        return new Bundle();
     }
 }

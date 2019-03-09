@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements
         EarthquakeMapFragment.OnFragmentInteractionListener {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    private SearchContainerFragment searchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
