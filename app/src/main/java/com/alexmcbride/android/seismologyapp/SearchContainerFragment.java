@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import java.util.Date;
 
 public class SearchContainerFragment extends Fragment {
+    private ChildFragmentManager mChildFragmentManager = new ChildFragmentManager();
     private SearchEarthquakesFragment searchEarthquakesFragment;
     private SearchResultsFragment searchResultsFragment;
     private OnFragmentInteractionListener mListener;
@@ -28,17 +29,7 @@ public class SearchContainerFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        // Save state of child fragments
-        saveFragmentState(searchEarthquakesFragment, outState);
-        saveFragmentState(searchResultsFragment, outState);
-    }
-
-    private void saveFragmentState(FragmentState fragmentState, Bundle outState) {
-        if (fragmentState != null) {
-            Bundle state = fragmentState.getSavedState();
-            outState.putAll(state);
-        }
+        mChildFragmentManager.saveState(outState);
     }
 
     @Override
@@ -48,11 +39,9 @@ public class SearchContainerFragment extends Fragment {
         searchEarthquakesFragment = SearchEarthquakesFragment.newInstance();
         searchResultsFragment = SearchResultsFragment.newInstance();
 
-        // Load state of child fragments.
-        if (savedInstanceState != null) {
-            searchEarthquakesFragment.setSavedState(savedInstanceState);
-            searchResultsFragment.setSavedState(savedInstanceState);
-        }
+        mChildFragmentManager.add(searchEarthquakesFragment);
+        mChildFragmentManager.add(searchResultsFragment);
+        mChildFragmentManager.loadState(savedInstanceState);
     }
 
     @Override
