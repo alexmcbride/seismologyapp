@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public class SearchResultsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private Date mStartDate;
     private Date mEndDate;
+    private TextView textView;
 
     public static SearchResultsFragment newInstance() {
         return new SearchResultsFragment();
@@ -44,7 +46,7 @@ public class SearchResultsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
-
+        textView = view.findViewById(R.id.textView);
         return view;
     }
 
@@ -65,6 +67,7 @@ public class SearchResultsFragment extends Fragment {
 
     void updateSearchResults(Date start, Date end) {
         // update ui
+        textView.setText("Updated");
     }
 
     public interface OnFragmentInteractionListener {

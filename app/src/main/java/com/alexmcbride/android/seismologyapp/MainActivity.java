@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SearchEarthquakesFragment.OnFragmentInteractionListener,
+public class MainActivity extends AppCompatActivity implements SearchContainerFragment.OnFragmentInteractionListener,
         SearchResultsFragment.OnFragmentInteractionListener,
         EarthquakeListFragment.OnFragmentInteractionListener,
         EarthquakeDetailFragment.OnFragmentInteractionListener,
@@ -69,13 +69,8 @@ public class MainActivity extends AppCompatActivity implements SearchEarthquakes
 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            SearchContainerFragment fragment = (SearchContainerFragment)mSectionsPagerAdapter.getFragment("search");
-            fragment.searchEarthquakes(start, end);
-        } else {
-            Intent intent = SearchResultsActivity.newInstance(this, start, end);
-            startActivity(intent);
-        }
+        Intent intent = SearchResultsActivity.newInstance(this, start, end);
+        startActivity(intent);
     }
 
     @Override
