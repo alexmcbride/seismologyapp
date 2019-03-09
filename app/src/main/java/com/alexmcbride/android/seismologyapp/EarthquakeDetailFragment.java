@@ -8,10 +8,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class EarthquakeDetailFragment extends Fragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
-    private OnFragmentInteractionListener mListener;
+    private TextView mTextView;
+    private long mCurrentId;
 
     public static EarthquakeDetailFragment newInstance(long id) {
         EarthquakeDetailFragment fragment =  new EarthquakeDetailFragment();
@@ -25,7 +27,8 @@ public class EarthquakeDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_detail, container, false);
-
+        mTextView = view.findViewById(R.id.textView);
+        updateEarthquake();
         return view;
     }
 
@@ -39,21 +42,15 @@ public class EarthquakeDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            long id = args.getLong(ARG_EARTHQUAKE_ID, -1);
+            mCurrentId = args.getLong(ARG_EARTHQUAKE_ID, -1);
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof EarthquakeDetailFragment.OnFragmentInteractionListener) {
-            mListener = (EarthquakeDetailFragment.OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
+    void updateEarthquake() {
+        updateEarthquake(mCurrentId);
     }
 
-    public interface OnFragmentInteractionListener {
-
+    void updateEarthquake(long id) {
+        mTextView.setText("Selected " + id);
     }
 }

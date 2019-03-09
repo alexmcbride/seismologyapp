@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 import java.util.Objects;
 
-public class EarthquakeDetailActivity extends AppCompatActivity implements EarthquakeDetailFragment.OnFragmentInteractionListener {
+public class EarthquakeDetailActivity extends AppCompatActivity {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
 
     public static Intent newInstance(Context context, long id) {

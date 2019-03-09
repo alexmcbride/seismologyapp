@@ -15,7 +15,6 @@ import java.util.Date;
 public class SearchResultsFragment extends Fragment {
     private static final String ARG_START_TIME = "ARG_START_TIME";
     private static final String ARG_END_TIME = "ARG_END_TIME";
-    private OnFragmentInteractionListener mListener;
     private Date mStartDate;
     private Date mEndDate;
     private TextView textView;
@@ -55,22 +54,8 @@ public class SearchResultsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof SearchResultsFragment.OnFragmentInteractionListener) {
-            mListener = (SearchResultsFragment.OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
-
     void updateSearchResults(Date start, Date end) {
         // update ui
         textView.setText("Updated");
-    }
-
-    public interface OnFragmentInteractionListener {
-
     }
 }

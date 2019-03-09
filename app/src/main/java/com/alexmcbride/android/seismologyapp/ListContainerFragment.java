@@ -10,18 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Date;
-
-public class SearchContainerFragment extends Fragment {
-    private SearchResultsFragment searchResultsFragment;
+public class ListContainerFragment extends Fragment {
+    private EarthquakeDetailFragment mEarthquakeDetailFragment;
     private OnFragmentInteractionListener mListener;
 
-    public SearchContainerFragment() {
+    public ListContainerFragment() {
         // Required
     }
 
-    public static SearchContainerFragment newInstance() {
-        return new SearchContainerFragment();
+    public static ListContainerFragment newInstance() {
+        return new ListContainerFragment();
     }
 
     @Override
@@ -36,22 +34,22 @@ public class SearchContainerFragment extends Fragment {
         final boolean hasDetailContainer = view.findViewById(R.id.detailContainer) != null;
         final FragmentManager fm = getChildFragmentManager();
 
-        SearchEarthquakesFragment searchEarthquakesFragment = SearchEarthquakesFragment.newInstance();
-        searchEarthquakesFragment.setListener(new SearchEarthquakesFragment.OnFragmentInteractionListener() {
+        EarthquakeListFragment earthquakeListFragment = EarthquakeListFragment.newInstance();
+        earthquakeListFragment.setListener(new EarthquakeListFragment.OnFragmentInteractionListener() {
             @Override
-            public void onSearchEarthquakes(Date start, Date end) {
+            public void onEarthquakeSelected(long id) {
                 if (hasDetailContainer) {
-                    searchResultsFragment.updateSearchResults(start, end);
+                    mEarthquakeDetailFragment.updateEarthquake(id);
                 } else {
-                    mListener.onSearchEarthquakes(start, end);
+                    mListener.onEarthquakeSelected(id);
                 }
             }
         });
-        fm.beginTransaction().replace(R.id.masterContainer, searchEarthquakesFragment).commitNow();
+        fm.beginTransaction().replace(R.id.masterContainer, earthquakeListFragment).commitNow();
 
         if (hasDetailContainer) {
-            searchResultsFragment = SearchResultsFragment.newInstance();
-            fm.beginTransaction().replace(R.id.detailContainer, searchResultsFragment).commitNow();
+            mEarthquakeDetailFragment = EarthquakeDetailFragment.newInstance(0);
+            fm.beginTransaction().replace(R.id.detailContainer, mEarthquakeDetailFragment).commitNow();
         }
     }
 
@@ -72,6 +70,6 @@ public class SearchContainerFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onSearchEarthquakes(Date start, Date end);
+        void onEarthquakeSelected(long id);
     }
 }

@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Date;
 import java.util.Objects;
 
-public class SearchResultsActivity extends AppCompatActivity implements SearchResultsFragment.OnFragmentInteractionListener {
+public class SearchResultsActivity extends AppCompatActivity {
     private static final String ARG_START_DATE = "ARG_START_DATE";
     private static final String ARG_END_DATE = "ARG_END_DATE";
 
