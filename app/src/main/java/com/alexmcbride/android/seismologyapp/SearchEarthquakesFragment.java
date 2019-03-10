@@ -126,7 +126,7 @@ public class SearchEarthquakesFragment extends Fragment implements ChildFragment
     }
 
     @Override
-    public void setSavedState(Bundle bundle) {
+    public void loadSavedState(Bundle bundle) {
         mStartDate = (Calendar) bundle.getSerializable(ARG_START_DATE);
         mEndDate = (Calendar) bundle.getSerializable(ARG_END_DATE);
     }

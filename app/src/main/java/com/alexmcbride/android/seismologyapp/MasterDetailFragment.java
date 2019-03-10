@@ -39,21 +39,21 @@ public abstract class MasterDetailFragment extends Fragment {
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.containerMaster, masterFragment).commitNow();
 
-        // Tell master fragment to load it's state.
+        // Tell master fragment to load its state.
         if (savedInstanceState != null) {
-            ((ChildFragment) masterFragment).setSavedState(savedInstanceState);
+            ((ChildFragment) masterFragment).loadSavedState(savedInstanceState);
         }
 
         // Load details fragment if the details container exists. This will only exist in landscape
         // mode.
-        if (view.findViewById(R.id.containerDetail) != null) {
-            mHasDetailsContainer = true;
+        mHasDetailsContainer = view.findViewById(R.id.containerDetail) != null;
+        if (mHasDetailsContainer) {
             Fragment detailFragment = getDetailsFragment();
             fragmentManager.beginTransaction().replace(R.id.containerDetail, detailFragment).commitNow();
 
-            // Tell child fragment to load its state.
+            // Tell details fragment to load its state.
             if (savedInstanceState != null) {
-                ((ChildFragment) detailFragment).setSavedState(savedInstanceState);
+                ((ChildFragment) detailFragment).loadSavedState(savedInstanceState);
             }
         }
 

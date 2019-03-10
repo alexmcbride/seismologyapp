@@ -65,7 +65,7 @@ public class SearchResultsFragment extends Fragment implements ChildFragment {
     }
 
     @Override
-    public void setSavedState(Bundle savedInstanceState) {
+    public void loadSavedState(Bundle savedInstanceState) {
 
     }
 

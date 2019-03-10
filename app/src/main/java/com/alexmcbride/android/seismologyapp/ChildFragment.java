@@ -8,5 +8,5 @@ import android.os.Bundle;
  */
 public interface ChildFragment {
     Bundle getSavedState();
-    void setSavedState(Bundle bundle);
+    void loadSavedState(Bundle bundle);
 }

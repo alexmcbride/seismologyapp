@@ -47,7 +47,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     }
 
     @Override
-    public void setSavedState(Bundle bundle) {
+    public void loadSavedState(Bundle bundle) {
 
     }
 
