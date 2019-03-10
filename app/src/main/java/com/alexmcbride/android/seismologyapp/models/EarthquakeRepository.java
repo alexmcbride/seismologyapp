@@ -7,22 +7,35 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.google.common.collect.Lists;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-public class EarthquakeRepository implements Closeable {
+public class EarthquakeRepository implements AutoCloseable {
+    private static final String EARTHQUAKES_TABLE = "earthquakes";
     private final EarthquakeDbHelper mDbHelper;
 
     public EarthquakeRepository(Context context) {
         mDbHelper = new EarthquakeDbHelper(context);
     }
 
+    public boolean earthquakeExists(String link) {
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
+             Cursor cursor = db.rawQuery("SELECT COUNT(id) FROM earthquakes WHERE link=?", new String[]{link})) {
+            return cursor.getInt(0) > 0;
+        }
+    }
+
+    public void addEarthquakes(List<Earthquake> earthquakes) {
+        for (Earthquake earthquake : earthquakes) {
+            addEarthquake(earthquake);
+        }
+    }
+
     public boolean addEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
-            long id = db.insert("earthquakes", null, contentValues);
+            long id = db.insertWithOnConflict(EARTHQUAKES_TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
             if (id > -1) {
                 earthquake.setId(id);
                 return true;
@@ -35,7 +48,7 @@ public class EarthquakeRepository implements Closeable {
     public boolean updateEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
-            long affected = db.update("earthquakes", contentValues, "WHERE id=?",
+            long affected = db.update(EARTHQUAKES_TABLE, contentValues, "WHERE id=?",
                     new String[]{String.valueOf(earthquake.getId())});
             return affected > 0;
         }
@@ -43,7 +56,6 @@ public class EarthquakeRepository implements Closeable {
 
     private ContentValues getContentValues(Earthquake earthquake) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put("id", earthquake.getId());
         contentValues.put("title", earthquake.getTitle());
         contentValues.put("description", earthquake.getDescription());
         contentValues.put("link", earthquake.getLink());
@@ -57,7 +69,7 @@ public class EarthquakeRepository implements Closeable {
     public List<Earthquake> getEarthquakes() {
         List<Earthquake> earthquakes = Lists.newArrayList();
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
-             Cursor cursor = db.query("earthquakes", null, null, null, null, null, null)) {
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null, null, null, null, null)) {
             if (cursor.moveToFirst()) {
                 do {
                     earthquakes.add(getEarthquake(cursor));
@@ -69,7 +81,7 @@ public class EarthquakeRepository implements Closeable {
 
     public Earthquake getEarthquake(long id) {
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
-             Cursor cursor = db.query("earthquakes", null,
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
                      "WHERE id=?", new String[]{String.valueOf(id)},
                      null, null, null)) {
             if (cursor.moveToFirst()) {
