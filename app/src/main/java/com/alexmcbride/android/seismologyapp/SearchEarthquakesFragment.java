@@ -19,6 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
+/*
+ * Fragment used to search for earthquakes.
+ */
 public class SearchEarthquakesFragment extends Fragment implements ChildFragment {
     private static final String ARG_START_DATE = "SEARCH_START_DATE";
     private static final String ARG_END_DATE = "SEARCH_END_DATE";

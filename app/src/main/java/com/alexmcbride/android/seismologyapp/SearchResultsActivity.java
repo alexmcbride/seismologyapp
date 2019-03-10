@@ -9,6 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Date;
 import java.util.Objects;
 
+/*
+ * Activity used to display a single set of search results, typically used when the device is in
+ * portrait mode.
+ */
 public class SearchResultsActivity extends AppCompatActivity {
     private static final String ARG_START_DATE = "ARG_START_DATE";
     private static final String ARG_END_DATE = "ARG_END_DATE";

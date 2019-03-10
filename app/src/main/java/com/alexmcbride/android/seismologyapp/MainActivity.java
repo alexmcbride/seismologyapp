@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements
         SearchMasterDetailFragment.OnFragmentInteractionListener,
         ListMasterDetailFragment.OnFragmentInteractionListener,
         EarthquakeMapFragment.OnFragmentInteractionListener {
-    private static final String ARG_SELECTED_TAB = "ARG_SELECTED_TAB";
+    private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
     private ViewPager mViewPager;
 
     @Override
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Add tabs to our adapter.
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         sectionsPagerAdapter.addPage(SearchMasterDetailFragment.newInstance(), "Search");
         sectionsPagerAdapter.addPage(ListMasterDetailFragment.newInstance(), "List");
@@ -51,20 +52,19 @@ public class MainActivity extends AppCompatActivity implements
 
         tabLayout.setupWithViewPager(mViewPager);
 
+        // Load preferences
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-        int selectedTab = preferences.getInt(ARG_SELECTED_TAB, 0);
-        mViewPager.setCurrentItem(selectedTab);
+        mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        int selectedTab = mViewPager.getCurrentItem();
-
+        // Save preferences
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(ARG_SELECTED_TAB, selectedTab);
+        editor.putInt(ARG_SELECTED_PAGE, mViewPager.getCurrentItem());
         editor.apply();
     }
 
@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    // Acts as a collection of tabs for the view pager.
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
         private List<Page> mPageList = Lists.newArrayList();
 
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements
             return mPageList.size();
         }
 
+        // Internal class to represent a page of the view pager.
         private class Page {
             Fragment fragment;
             String title;

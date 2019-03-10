@@ -3,6 +3,10 @@ package com.alexmcbride.android.seismologyapp;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+/*
+ * Fragment to represent the earthquake list/detail view. In portrait only list is shown, in landscape
+ * both list and detail are shown. In portrait selected event is passed back to main activity.
+ */
 public class ListMasterDetailFragment extends MasterDetailFragment implements EarthquakeListFragment.OnFragmentInteractionListener {
     private EarthquakeListFragment mEarthquakeListFragment;
     private EarthquakeDetailFragment mEarthquakeDetailFragment;

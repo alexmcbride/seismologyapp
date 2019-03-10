@@ -5,6 +5,10 @@ import android.support.v4.app.Fragment;
 
 import java.util.Date;
 
+/*
+ * Fragment to represent the search/results view. In portrait only search is shown, in landscape
+ * both search and results are shown. In portrait search event is passed back to main activity.
+ */
 public class SearchMasterDetailFragment extends MasterDetailFragment implements SearchEarthquakesFragment.OnFragmentInteractionListener {
     private SearchEarthquakesFragment mSearchEarthquakesFragment;
     private SearchResultsFragment mSearchResultsFragment;

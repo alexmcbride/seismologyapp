@@ -9,6 +9,10 @@ import android.os.Bundle;
 
 import java.util.Objects;
 
+/*
+ * Activity used to display details of a single earthquake, typically used when the device is in
+ * portrait mode.
+ */
 public class EarthquakeDetailActivity extends AppCompatActivity {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
 

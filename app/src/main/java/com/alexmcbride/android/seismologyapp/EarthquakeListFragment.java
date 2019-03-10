@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+/*
+ * Fragment used to select a list of earthquakes.
+ */
 public class EarthquakeListFragment extends Fragment implements ChildFragment {
     private OnFragmentInteractionListener mListener;
 

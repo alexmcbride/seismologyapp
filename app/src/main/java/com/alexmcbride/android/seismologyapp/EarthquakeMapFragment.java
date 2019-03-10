@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+/*
+ * Fragment to show all earthquakes plotted on a map.
+ */
 public class EarthquakeMapFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 

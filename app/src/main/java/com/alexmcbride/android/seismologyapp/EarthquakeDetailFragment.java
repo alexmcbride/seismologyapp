@@ -1,6 +1,5 @@
 package com.alexmcbride.android.seismologyapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+/*
+ * Fragment used to display the details of a single earthquake.
+ */
 public class EarthquakeDetailFragment extends Fragment implements ChildFragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
     private TextView mTextView;
