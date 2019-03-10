@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class EarthquakeListFragment extends Fragment {
+public class EarthquakeListFragment extends Fragment implements ChildFragment {
     private OnFragmentInteractionListener mListener;
 
     public EarthquakeListFragment() {
@@ -36,6 +36,16 @@ public class EarthquakeListFragment extends Fragment {
 
     void setListener(OnFragmentInteractionListener listener) {
         mListener = listener;
+    }
+
+    @Override
+    public Bundle getSavedState() {
+        return new Bundle();
+    }
+
+    @Override
+    public void setSavedState(Bundle bundle) {
+
     }
 
     public interface OnFragmentInteractionListener {

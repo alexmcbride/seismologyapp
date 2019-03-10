@@ -1,6 +1,8 @@
 package com.alexmcbride.android.seismologyapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -19,12 +21,11 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        SearchContainerFragment.OnFragmentInteractionListener,
-        ListContainerFragment.OnFragmentInteractionListener,
+        SearchMasterDetailFragment.OnFragmentInteractionListener,
+        ListMasterDetailFragment.OnFragmentInteractionListener,
         EarthquakeMapFragment.OnFragmentInteractionListener {
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static final String ARG_SELECTED_TAB = "ARG_SELECTED_TAB";
     private ViewPager mViewPager;
-    private SearchContainerFragment searchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +35,14 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mSectionsPagerAdapter.addPage(SearchContainerFragment.newInstance(), "Search");
-        mSectionsPagerAdapter.addPage(ListContainerFragment.newInstance(), "List");
-        mSectionsPagerAdapter.addPage(EarthquakeMapFragment.newInstance(), "Map");
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter.addPage(SearchMasterDetailFragment.newInstance(), "Search");
+        sectionsPagerAdapter.addPage(ListMasterDetailFragment.newInstance(), "List");
+        sectionsPagerAdapter.addPage(EarthquakeMapFragment.newInstance(), "Map");
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(sectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
 
@@ -49,6 +50,22 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         tabLayout.setupWithViewPager(mViewPager);
+
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        int selectedTab = preferences.getInt(ARG_SELECTED_TAB, 0);
+        mViewPager.setCurrentItem(selectedTab);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        int selectedTab = mViewPager.getCurrentItem();
+
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(ARG_SELECTED_TAB, selectedTab);
+        editor.apply();
     }
 
     @Override

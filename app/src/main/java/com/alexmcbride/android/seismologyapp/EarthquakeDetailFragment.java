@@ -10,13 +10,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class EarthquakeDetailFragment extends Fragment {
+public class EarthquakeDetailFragment extends Fragment implements ChildFragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
     private TextView mTextView;
     private long mCurrentId;
 
+    public static EarthquakeDetailFragment newInstance() {
+        return  new EarthquakeDetailFragment();
+    }
+
     public static EarthquakeDetailFragment newInstance(long id) {
-        EarthquakeDetailFragment fragment =  new EarthquakeDetailFragment();
+        EarthquakeDetailFragment fragment =  newInstance();
         Bundle args = new Bundle();
         args.putLong(ARG_EARTHQUAKE_ID, id);
         fragment.setArguments(args);
@@ -52,5 +56,15 @@ public class EarthquakeDetailFragment extends Fragment {
 
     void updateEarthquake(long id) {
         mTextView.setText("Selected " + id);
+    }
+
+    @Override
+    public Bundle getSavedState() {
+        return new Bundle();
+    }
+
+    @Override
+    public void setSavedState(Bundle bundle) {
+
     }
 }

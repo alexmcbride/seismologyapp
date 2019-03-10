@@ -1,0 +1,60 @@
+package com.alexmcbride.android.seismologyapp;
+
+import android.content.Context;
+import android.support.v4.app.Fragment;
+
+public class ListMasterDetailFragment extends MasterDetailFragment implements EarthquakeListFragment.OnFragmentInteractionListener {
+    private EarthquakeListFragment mEarthquakeListFragment;
+    private EarthquakeDetailFragment mEarthquakeDetailFragment;
+    private OnFragmentInteractionListener mListener;
+
+    @Override
+    protected Fragment getMasterFragment() {
+        if (mEarthquakeListFragment == null) {
+            mEarthquakeListFragment = EarthquakeListFragment.newInstance();
+            mEarthquakeListFragment.setListener(this);
+        }
+        return mEarthquakeListFragment;
+    }
+
+    @Override
+    protected Fragment getDetailsFragment() {
+        if (mEarthquakeDetailFragment == null) {
+            mEarthquakeDetailFragment = EarthquakeDetailFragment.newInstance();
+        }
+        return mEarthquakeDetailFragment;
+    }
+
+    public static ListMasterDetailFragment newInstance() {
+        return new ListMasterDetailFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onEarthquakeSelected(long id) {
+        if (hasDetailsContainer()) {
+            mEarthquakeDetailFragment.updateEarthquake(id);
+        } else {
+            mListener.onEarthquakeSelected(id);
+        }
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onEarthquakeSelected(long id);
+    }
+}
