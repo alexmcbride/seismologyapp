@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 public class EarthquakeDbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "earthquake-db";
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
 
     public EarthquakeDbHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -17,7 +17,7 @@ public class EarthquakeDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS earthquakes (" +
-                "id INTEGER PRIMARY KEY," +
+                "_id INTEGER PRIMARY KEY," +
                 "title TEXT," +
                 "description TEXT," +
                 "link TEXT," +

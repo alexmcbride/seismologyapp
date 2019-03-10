@@ -1,25 +1,21 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
+import com.alexmcbride.android.seismologyapp.models.EarthquakeCursorWrapper;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
-
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Nullable;
 
 /*
  * Fragment used to select a list of earthquakes.
@@ -29,6 +25,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
+    private Cursor mEarthquakeCursor;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -52,10 +49,15 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
         });
 
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
-        List<Earthquake> earthquakes = mEarthquakeRepository.getEarthquakes();
-        updateEarthquakes(earthquakes);
+        updateEarthquakes();
 
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        closeCursor();
     }
 
     void setListener(OnFragmentInteractionListener listener) {
@@ -72,31 +74,39 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
 
     }
 
-    void updateEarthquakes(List<Earthquake> earthquakes) {
-        Log.d(TAG, "Earthquakes: " + earthquakes.size());
-        EarthquakeAdapter adapter = new EarthquakeAdapter(getActivity(), earthquakes);
+    void updateEarthquakes() {
+        closeCursor();
+        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor();
+        EarthquakeCursorAdapter adapter = new EarthquakeCursorAdapter(getActivity(), mEarthquakeCursor);
         mListEarthquakes.setAdapter(adapter);
     }
 
-    private class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
-        EarthquakeAdapter(@NonNull Context context, List<Earthquake> earthquakes) {
-            super(context, -1);
-            addAll(earthquakes);
+    private void closeCursor() {
+        if (mEarthquakeCursor != null) {
+            mEarthquakeCursor.close();
+        }
+    }
+
+    private class EarthquakeCursorAdapter extends CursorAdapter {
+        private EarthquakeCursorWrapper mCursorWrapper;
+
+        EarthquakeCursorAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+            mCursorWrapper = new EarthquakeCursorWrapper(cursor);
         }
 
-        @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                LayoutInflater inflater = getLayoutInflater();
-                convertView = inflater.inflate(R.layout.list_item_earthquake, parent, false);
-            }
+        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+            View view = getLayoutInflater().inflate(R.layout.list_item_earthquake, viewGroup, false);
+            bindView(view, context, cursor);
+            return view;
+        }
 
-            Earthquake earthquake = Objects.requireNonNull(getItem(position));
-            TextView textTitle = convertView.findViewById(R.id.textTitle);
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            Earthquake earthquake = mCursorWrapper.getEarthquake();
+            TextView textTitle = view.findViewById(R.id.textTitle);
             textTitle.setText(earthquake.getTitle());
-
-            return convertView;
         }
     }
 

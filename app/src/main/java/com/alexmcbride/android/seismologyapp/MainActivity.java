@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(List<Earthquake> earthquakes) {
             if (mException == null) {
                 mEarthquakeRepository.addEarthquakes(earthquakes);
-                mListMasterDetailFragment.updateEarthquakes(earthquakes);
+                mListMasterDetailFragment.updateEarthquakes();
             } else {
                 Log.d(TAG, mException.toString());
                 Toast.makeText(MainActivity.this, "Error: " + mException.getMessage(), Toast.LENGTH_SHORT).show();
