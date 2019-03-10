@@ -12,15 +12,15 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-public class EarthquakeDatabase implements Closeable {
-    private final EarthquakeSqlOpenHelper mOpenHelper;
+public class EarthquakeRepository implements Closeable {
+    private final EarthquakeDbHelper mDbHelper;
 
-    public EarthquakeDatabase(Context context) {
-        mOpenHelper = new EarthquakeSqlOpenHelper(context);
+    public EarthquakeRepository(Context context) {
+        mDbHelper = new EarthquakeDbHelper(context);
     }
 
     public boolean addEarthquake(Earthquake earthquake) {
-        try (SQLiteDatabase db = mOpenHelper.getWritableDatabase()) {
+        try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
             long id = db.insert("earthquakes", null, contentValues);
             if (id > -1) {
@@ -33,7 +33,7 @@ public class EarthquakeDatabase implements Closeable {
     }
 
     public boolean updateEarthquake(Earthquake earthquake) {
-        try (SQLiteDatabase db = mOpenHelper.getWritableDatabase()) {
+        try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
             long affected = db.update("earthquakes", contentValues, "WHERE id=?",
                     new String[]{String.valueOf(earthquake.getId())});
@@ -56,7 +56,7 @@ public class EarthquakeDatabase implements Closeable {
 
     public List<Earthquake> getEarthquakes() {
         List<Earthquake> earthquakes = Lists.newArrayList();
-        try (SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
              Cursor cursor = db.query("earthquakes", null, null, null, null, null, null)) {
             if (cursor.moveToFirst()) {
                 do {
@@ -68,7 +68,7 @@ public class EarthquakeDatabase implements Closeable {
     }
 
     public Earthquake getEarthquake(long id) {
-        try (SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
              Cursor cursor = db.query("earthquakes", null,
                      "WHERE id=?", new String[]{String.valueOf(id)},
                      null, null, null)) {
@@ -95,6 +95,6 @@ public class EarthquakeDatabase implements Closeable {
 
     @Override
     public void close() throws IOException {
-        mOpenHelper.close();
+        mDbHelper.close();
     }
 }
