@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.alexmcbride.android.seismologyapp.models.EarthquakeRssReader;
 import com.google.common.collect.Lists;
 
 import java.util.Date;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements
         EarthquakeMapFragment.OnFragmentInteractionListener {
     private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
     private ViewPager mViewPager;
+    private EarthquakeRssReader mEarthquakeRssReader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
