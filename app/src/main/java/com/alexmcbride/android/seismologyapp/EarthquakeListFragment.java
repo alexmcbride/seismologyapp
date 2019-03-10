@@ -1,6 +1,7 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.alexmcbride.android.seismologyapp.models.CloseableCursor;
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeCursorWrapper;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
@@ -26,8 +28,8 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
-    private Cursor mEarthquakeCursor;
-    private SQLiteDatabase mDatabase;
+    private CloseableCursor mEarthquakeCursor;
+
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -45,8 +47,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
         mListEarthquakes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Earthquake earthquake = (Earthquake) adapterView.getItemAtPosition(position);
-                mListener.onEarthquakeSelected(earthquake.getId());
+                mListener.onEarthquakeSelected(id);
             }
         });
 
@@ -68,7 +69,8 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
 
     @Override
     public Bundle getSavedState() {
-        return new Bundle();
+        Bundle state = new Bundle();
+        return state;
     }
 
     @Override
@@ -80,17 +82,12 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
         closeDatabase();
 
         // We do it this way so we can close the resources later.
-        mDatabase = mEarthquakeRepository.getReadableDatabase();
-        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor(mDatabase);
-
-        EarthquakeCursorAdapter adapter = new EarthquakeCursorAdapter(getActivity(), mEarthquakeCursor);
+        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor();
+        EarthquakeCursorAdapter adapter = new EarthquakeCursorAdapter(getActivity(), mEarthquakeCursor.getCursor());
         mListEarthquakes.setAdapter(adapter);
     }
 
     private void closeDatabase() {
-        if (mDatabase != null) {
-            mDatabase.close();
-        }
         if (mEarthquakeCursor != null) {
             mEarthquakeCursor.close();
         }

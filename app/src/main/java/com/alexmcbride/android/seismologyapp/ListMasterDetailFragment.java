@@ -3,10 +3,6 @@ package com.alexmcbride.android.seismologyapp;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
-import com.alexmcbride.android.seismologyapp.models.Earthquake;
-
-import java.util.List;
-
 /*
  * Fragment to represent the earthquake list/detail view. In portrait only list is shown, in landscape
  * both list and detail are shown. In portrait selected event is passed back to main activity.

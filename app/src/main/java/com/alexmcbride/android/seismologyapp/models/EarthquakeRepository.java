@@ -74,13 +74,11 @@ public class EarthquakeRepository implements AutoCloseable {
         return earthquakes;
     }
 
-    public SQLiteDatabase getReadableDatabase() {
-        return mDbHelper.getReadableDatabase();
-    }
-
-    public Cursor getEarthquakesCursor(SQLiteDatabase db) {
-        return db.query(EARTHQUAKES_TABLE, null, null, null,
+    public CloseableCursor getEarthquakesCursor() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null, null,
                 null, null, null);
+        return new CloseableCursor(db, cursor);
     }
 
     public Earthquake getEarthquake(long id) {
