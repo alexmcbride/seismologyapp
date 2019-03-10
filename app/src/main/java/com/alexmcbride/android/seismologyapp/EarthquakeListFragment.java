@@ -2,6 +2,7 @@ package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
     private Cursor mEarthquakeCursor;
+    private SQLiteDatabase mDatabase;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -57,7 +59,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     @Override
     public void onStop() {
         super.onStop();
-        closeCursor();
+        closeDatabase();
     }
 
     void setListener(OnFragmentInteractionListener listener) {
@@ -75,13 +77,20 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
     }
 
     void updateEarthquakes() {
-        closeCursor();
-        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor();
+        closeDatabase();
+
+        // We do it this way so we can close the resources later.
+        mDatabase = mEarthquakeRepository.getReadableDatabase();
+        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor(mDatabase);
+
         EarthquakeCursorAdapter adapter = new EarthquakeCursorAdapter(getActivity(), mEarthquakeCursor);
         mListEarthquakes.setAdapter(adapter);
     }
 
-    private void closeCursor() {
+    private void closeDatabase() {
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
         if (mEarthquakeCursor != null) {
             mEarthquakeCursor.close();
         }
