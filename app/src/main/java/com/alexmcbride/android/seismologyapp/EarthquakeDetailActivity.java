@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
  */
 public class EarthquakeDetailActivity extends AppCompatActivity {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
+    private static final String TAG = "EarthquakeDetailActivit";
 
     public static Intent newInstance(Context context, long id) {
         Intent intent = new Intent(context, EarthquakeDetailActivity.class);
@@ -32,9 +34,13 @@ public class EarthquakeDetailActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             Fragment fragment = EarthquakeDetailFragment.newInstance(id);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .commitNow();
+            try {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commitNow();
+            }catch(Exception e){
+                Log.d(TAG, e.toString());
+            }
         }
 
         ActionBar actionBar = getSupportActionBar();

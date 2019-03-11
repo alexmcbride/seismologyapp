@@ -42,6 +42,7 @@ public class EarthquakeListFragment extends ChildFragment {
     private ArrayAdapter<CharSequence> mSpinnerSortOptionsAdapter;
     private LocationManager mLocationManager;
     private Location mLastKnownLocation;
+    private EarthquakesAdapter mEarthquakesAdapter;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -97,7 +98,8 @@ public class EarthquakeListFragment extends ChildFragment {
         mListEarthquakes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                mListener.onEarthquakeSelected(id);
+                Earthquake earthquake = mEarthquakesAdapter.getItem(position);
+                mListener.onEarthquakeSelected(earthquake.getId());
             }
         });
 
@@ -149,8 +151,8 @@ public class EarthquakeListFragment extends ChildFragment {
 
     private void earthquakesUpdated(String sortOption) {
         List<Earthquake> earthquakes = sortEarthquakeList(sortOption);
-        EarthquakesAdapter adapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
-        mListEarthquakes.setAdapter(adapter);
+        mEarthquakesAdapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
+        mListEarthquakes.setAdapter(mEarthquakesAdapter);
     }
 
     private List<Earthquake> sortEarthquakeList(String sortOption) {

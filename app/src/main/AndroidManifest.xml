@@ -15,6 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBDrIdhOL-D1IweCowRtrhROpOoQg9dEfY" />
+
         <activity
             android:name=".EarthquakeDetailActivity"
             android:parentActivityName=".MainActivity" />

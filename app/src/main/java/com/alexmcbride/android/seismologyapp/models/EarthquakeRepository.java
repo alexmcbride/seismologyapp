@@ -49,7 +49,7 @@ public class EarthquakeRepository implements AutoCloseable {
     public boolean updateEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
-            long affected = db.update(EARTHQUAKES_TABLE, contentValues, "WHERE _id=?",
+            long affected = db.update(EARTHQUAKES_TABLE, contentValues, "_id=?",
                     new String[]{String.valueOf(earthquake.getId())});
             return affected > 0;
         }
@@ -120,7 +120,7 @@ public class EarthquakeRepository implements AutoCloseable {
     public Earthquake getEarthquake(long id) {
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
              Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
-                     "WHERE _id=?", new String[]{String.valueOf(id)},
+                     "_id=?", new String[]{String.valueOf(id)},
                      null, null, null)) {
             if (cursor.moveToFirst()) {
                 EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
