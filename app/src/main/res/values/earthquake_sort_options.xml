@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="earthquake_sort_options">
+        <item>Location</item>
         <item>Date</item>
         <item>Nearest</item>
-        <item>Title</item>
         <item>Depth</item>
         <item>Magnitude</item>
+    </string-array>
+
+    <string-array name="earthquake_sort_direction">
+        <item>Asc</item>
+        <item>Desc</item>
     </string-array>
 </resources>

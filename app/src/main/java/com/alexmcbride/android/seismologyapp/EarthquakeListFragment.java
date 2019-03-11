@@ -35,13 +35,16 @@ import javax.annotation.Nullable;
  * which means a bunch of services and permissions.
  */
 public class EarthquakeListFragment extends ChildFragment {
-    private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final String ARG_SELECTED_SORT_OPTION = "ARG_SELECTED_SORT_OPTION";
+    private static final String ARG_SELECTED_SORT_DIRECTION = "ARG_SELECTED_SORT_DIRECTION";
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
-    private Spinner mSpinnerSortOptions;
-    private ArrayAdapter<CharSequence> mSpinnerSortOptionsAdapter;
+    private Spinner mSpinnerOptions;
+    private Spinner mSpinnerDirection;
+    private ArrayAdapter<CharSequence> mSpinnerOptionsAdapter;
+    private ArrayAdapter<CharSequence> mSpinnerDirectionAdapter;
     private LocationManager mLocationManager;
     private Location mLastLocation;
     private EarthquakesAdapter mEarthquakesAdapter;
@@ -61,6 +64,7 @@ public class EarthquakeListFragment extends ChildFragment {
         // We need to know the user's location for the sort by nearest option.
         Activity activity = Objects.requireNonNull(getActivity());
         mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+
         updateLastLocation();
     }
 
@@ -72,10 +76,16 @@ public class EarthquakeListFragment extends ChildFragment {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Toast.makeText(activity, R.string.location_permission_explanation, Toast.LENGTH_SHORT).show();
             } else {
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             }
         } else {
+            // Try first get GPS, fallback to network.
+            // todo: rewrite to use more modern fused location provider
+            // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
             mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (mLastLocation==null){
+                mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
         }
     }
 
@@ -83,7 +93,7 @@ public class EarthquakeListFragment extends ChildFragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // Check if permission granted.
-        if (requestCode == PERMISSION_REQUEST_CODE) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Try and get the location again.
                 updateLastLocation();
@@ -96,6 +106,7 @@ public class EarthquakeListFragment extends ChildFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_list, container, false);
+        Activity activity = Objects.requireNonNull(getActivity());
 
         // Init list.
         mListEarthquakes = view.findViewById(R.id.listEarthquakes);
@@ -107,18 +118,31 @@ public class EarthquakeListFragment extends ChildFragment {
             }
         });
 
-        // Init spinner (dropdown for sort option)
-        Activity activity = Objects.requireNonNull(getActivity());
-        mSpinnerSortOptions = view.findViewById(R.id.spinnerSortOptions);
-        mSpinnerSortOptionsAdapter = ArrayAdapter.createFromResource(activity, R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
-        mSpinnerSortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerSortOptions.setAdapter(mSpinnerSortOptionsAdapter);
-        mSpinnerSortOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        // Init sort order spinner
+        mSpinnerOptions = view.findViewById(R.id.spinnerSortOptions);
+        mSpinnerOptionsAdapter = ArrayAdapter.createFromResource(activity, R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
+        mSpinnerOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerOptions.setAdapter(mSpinnerOptionsAdapter);
+        mSpinnerOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                CharSequence text = Objects.toString(mSpinnerSortOptionsAdapter.getItem(position));
-                String sortOption = text.toString();
-                earthquakesUpdated(sortOption);
+                earthquakesUpdated();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
+        // Init sort direction spinner
+        mSpinnerDirection = view.findViewById(R.id.spinnerSortDirection);
+        mSpinnerDirectionAdapter = ArrayAdapter.createFromResource(activity, R.array.earthquake_sort_direction, android.R.layout.simple_spinner_item);
+        mSpinnerDirectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerDirection.setAdapter(mSpinnerDirectionAdapter);
+        mSpinnerDirection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                earthquakesUpdated();
             }
 
             @Override
@@ -128,7 +152,8 @@ public class EarthquakeListFragment extends ChildFragment {
 
         // Get spinner setting out of preferences.
         SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
-        mSpinnerSortOptions.setSelection(preferences.getInt(ARG_SELECTED_SORT_OPTION, 0));
+        mSpinnerOptions.setSelection(preferences.getInt(ARG_SELECTED_SORT_OPTION, 0));
+        mSpinnerDirection.setSelection(preferences.getInt(ARG_SELECTED_SORT_DIRECTION, 0));
 
         // Init DB and load earthquakes.
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
@@ -145,7 +170,8 @@ public class EarthquakeListFragment extends ChildFragment {
         Activity activity = Objects.requireNonNull(getActivity());
         SharedPreferences preferences = activity.getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerSortOptions.getSelectedItemPosition());
+        editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerOptions.getSelectedItemPosition());
+        editor.putInt(ARG_SELECTED_SORT_DIRECTION, mSpinnerDirection.getSelectedItemPosition());
         editor.apply();
     }
 
@@ -164,17 +190,24 @@ public class EarthquakeListFragment extends ChildFragment {
     }
 
     private String getSelectedSortOption() {
-        int position = mSpinnerSortOptions.getSelectedItemPosition();
-        return Objects.requireNonNull(mSpinnerSortOptionsAdapter.getItem(position)).toString();
+        int position = mSpinnerOptions.getSelectedItemPosition();
+        return Objects.requireNonNull(mSpinnerOptionsAdapter.getItem(position)).toString();
+    }
+
+    private boolean getSelectedSortDirection() {
+        int position = mSpinnerDirection.getSelectedItemPosition();
+        String text = Objects.requireNonNull(mSpinnerDirectionAdapter.getItem(position)).toString();
+        return text.equalsIgnoreCase("asc");
     }
 
     void earthquakesUpdated() {
         String sortOption = getSelectedSortOption();
-        earthquakesUpdated(sortOption);
+        boolean sortDirection = getSelectedSortDirection();
+        earthquakesUpdated(sortOption, sortDirection);
     }
 
-    private void earthquakesUpdated(String sortOption) {
-        List<Earthquake> earthquakes = getSortedEarthquakes(sortOption);
+    private void earthquakesUpdated(String sortOption, boolean sortDirection) {
+        List<Earthquake> earthquakes = getSortedEarthquakes(sortOption, sortDirection);
         if (earthquakes != null) {
             mEarthquakesAdapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
             mListEarthquakes.setAdapter(mEarthquakesAdapter);
@@ -183,18 +216,18 @@ public class EarthquakeListFragment extends ChildFragment {
         }
     }
 
-    private List<Earthquake> getSortedEarthquakes(String sortOption) {
+    private List<Earthquake> getSortedEarthquakes(String sortOption, boolean sortDirection) {
         if (sortOption.equalsIgnoreCase("nearest") && mLastLocation != null) {
             return mEarthquakeRepository.getEarthquakesByNearest(mLastLocation.getLatitude(),
-                    mLastLocation.getLongitude(), true);
+                    mLastLocation.getLongitude(), sortDirection);
         } else if (sortOption.equalsIgnoreCase("date")) {
-            return mEarthquakeRepository.getEarthquakesByDate(true);
-        } else if (sortOption.equalsIgnoreCase("title")) {
-            return mEarthquakeRepository.getEarthquakesByTitle(true);
+            return mEarthquakeRepository.getEarthquakesByDate(sortDirection);
+        } else if (sortOption.equalsIgnoreCase("location")) {
+            return mEarthquakeRepository.getEarthquakesByTitle(sortDirection);
         } else if (sortOption.equalsIgnoreCase("depth")) {
-            return mEarthquakeRepository.getEarthquakesByDepth(true);
+            return mEarthquakeRepository.getEarthquakesByDepth(sortDirection);
         } else if (sortOption.equalsIgnoreCase("magnitude")) {
-            return mEarthquakeRepository.getEarthquakesByMagnitude(true);
+            return mEarthquakeRepository.getEarthquakesByMagnitude(sortDirection);
         } else {
             return null; // nothing
         }

@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements
 
         // Add tabs to our adapter.
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
         sectionsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
-        sectionsPagerAdapter.addPage(mListMasterDetailFragment, "List");
         sectionsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
 
         // Set up the ViewPager with the sections adapter.
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
-//        startDownloadTask();
+        startDownloadTask();
     }
 
     @Override

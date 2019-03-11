@@ -20,6 +20,6 @@ public class Util {
     }
 
     public static String formatPretty(Date date) {
-        return formatDate(date) + " " + formatTime(date);
+        return formatDate(date) + " - " + formatTime(date);
     }
 }

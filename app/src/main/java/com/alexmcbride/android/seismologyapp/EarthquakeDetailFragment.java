@@ -24,7 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class EarthquakeDetailFragment extends ChildFragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
     private static final String MAP_VIEW_BUNDLE_KEY = "MAP_VIEW_BUNDLE_KEY";
-    private static final float ZOOM_LEVEL = 14; // higher is closer
+    private static final float ZOOM_LEVEL = 11; // higher is closer
     private Earthquake mEarthquake;
     private MapView mMapView;
 

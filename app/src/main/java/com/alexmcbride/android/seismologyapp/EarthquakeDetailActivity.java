@@ -41,7 +41,7 @@ public class EarthquakeDetailActivity extends AppCompatActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        Objects.requireNonNull(actionBar).setTitle("Earthquake Detail");
+        Objects.requireNonNull(actionBar).setTitle(R.string.earthquake_detail_fragment_title);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 }

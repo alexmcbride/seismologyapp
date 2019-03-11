@@ -50,6 +50,7 @@ public class EarthquakeRssReader {
             if (eventType == XmlPullParser.END_TAG) {
                 if (earthquake != null && parser.getName().equalsIgnoreCase("item")) {
                     earthquakes.add(earthquake);
+                    earthquake = null;
                 }
             }
 
