@@ -84,7 +84,7 @@ public class EarthquakeListFragment extends ChildFragment {
         // Check if permission granted.
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Try get the location again.
+                // Try and get the location again.
                 updateLastKnownLocation();
             } else {
                 Toast.makeText(getActivity(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
@@ -96,6 +96,7 @@ public class EarthquakeListFragment extends ChildFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_list, container, false);
 
+        // Init list.
         mListEarthquakes = view.findViewById(R.id.listEarthquakes);
         mListEarthquakes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,6 +106,7 @@ public class EarthquakeListFragment extends ChildFragment {
             }
         });
 
+        // Init spinner (dropdown for sort option)
         mSpinnerSortOptions = view.findViewById(R.id.spinnerSortOptions);
         mSpinnerSortOptionsAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
         mSpinnerSortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -136,6 +138,7 @@ public class EarthquakeListFragment extends ChildFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Save spinner state.
         SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerSortOptions.getSelectedItemPosition());
