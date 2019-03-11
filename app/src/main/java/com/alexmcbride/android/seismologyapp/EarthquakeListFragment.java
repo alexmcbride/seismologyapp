@@ -25,7 +25,6 @@ import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
 import com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
@@ -56,14 +55,14 @@ public class EarthquakeListFragment extends ChildFragment {
     public void onCreate(@android.support.annotation.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // We need to know the user's location for the sort by nearest option.
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         updateLastKnownLocation();
     }
 
     private void updateLastKnownLocation() {
-        // We don't need better than coarse grained, as the earthquakes are quite spread out, that
-        // level of accuracy isn't needed. Also we don't both to update the location for the same
-        // reason.
+        // As the earthquakes are quite spread out a high level of accuracy isn't needed. Also we
+        // don't bother to update the location again for the same reason.
         Activity activity = Objects.requireNonNull(getActivity());
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -79,8 +78,10 @@ public class EarthquakeListFragment extends ChildFragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Check if permission granted.
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Try get the location again.
                 updateLastKnownLocation();
             } else {
                 Toast.makeText(getActivity(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
@@ -191,7 +192,7 @@ public class EarthquakeListFragment extends ChildFragment {
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             ((TextView) convertView.findViewById(R.id.textDepth)).setText(depth);
 
-            String magnitude = getString(R.string.earthquake_list_item_manitude, earthquake.getMagnitude());
+            String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());
             ((TextView) convertView.findViewById(R.id.textMagnitude)).setText(magnitude);
 
             return convertView;

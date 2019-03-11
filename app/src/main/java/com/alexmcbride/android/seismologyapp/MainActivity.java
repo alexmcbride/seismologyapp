@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements
 //        startDownloadTask();
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();

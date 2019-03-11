@@ -14,5 +14,5 @@
     <string name="location_permission_explanation">Location permission needed to sort by nearest</string>
     <string name="location_permission_denied">Location permission not granted :(</string>
     <string name="earthquake_list_item_depth" formatted="false">Depth: %.0f km</string>
-    <string name="earthquake_list_item_manitude">Magnitude: %.2f</string>
+    <string name="earthquake_list_item_magnitude">Magnitude: %.2f</string>
 </resources>
