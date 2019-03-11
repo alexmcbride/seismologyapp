@@ -11,10 +11,9 @@ public class Earthquake {
     private String mCategory;
     private double mLat;
     private double mLon;
-
-    private String location;
-    private double depth;
-    private double magnitude;
+    private String mLocation;
+    private double mDepth;
+    private double mMagnitude;
 
     public long getId() {
         return id;
@@ -81,26 +80,26 @@ public class Earthquake {
     }
 
     public String getLocation() {
-        return location;
+        return mLocation;
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        this.mLocation = location;
     }
 
     public double getDepth() {
-        return depth;
+        return mDepth;
     }
 
     public void setDepth(double depth) {
-        this.depth = depth;
+        this.mDepth = depth;
     }
 
     public double getMagnitude() {
-        return magnitude;
+        return mMagnitude;
     }
 
     public void setMagnitude(double magnitude) {
-        this.magnitude = magnitude;
+        this.mMagnitude = magnitude;
     }
 }

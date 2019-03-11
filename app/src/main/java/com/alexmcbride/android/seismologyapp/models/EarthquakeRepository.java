@@ -90,6 +90,12 @@ public class EarthquakeRepository implements AutoCloseable {
         return getEarthquakesInternal("magnitude ASC");
     }
 
+    public List<Earthquake> getEarthquakesByNearest(final double currentLat, final double currentLon) {
+        List<Earthquake> earthquakes = getEarthquakes();
+        Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon));
+        return earthquakes;
+    }
+
     private List<Earthquake> getEarthquakesInternal(String orderBy) {
         List<Earthquake> earthquakes = Lists.newArrayList();
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -104,17 +110,11 @@ public class EarthquakeRepository implements AutoCloseable {
         return earthquakes;
     }
 
-    public List<Earthquake> getEarthquakesByNearest(final double currentLat, final double currentLon) {
-        List<Earthquake> earthquakes = getEarthquakes();
-        Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon));
-        return earthquakes;
-    }
-
     public Earthquake getEarthquake(long id) {
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
              Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
-                     "_id=?", new String[]{String.valueOf(id)},
-                     null, null, null)) {
+                     "_id=?", new String[]{String.valueOf(id)}, null,
+                     null, null)) {
             if (cursor.moveToFirst()) {
                 EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
                 return cursorWrapper.getEarthquake();
