@@ -1,8 +1,15 @@
 package com.alexmcbride.android.seismologyapp;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
@@ -27,11 +35,15 @@ import javax.annotation.Nullable;
  */
 public class EarthquakeListFragment extends ChildFragment {
     private static final String TAG = "EarthquakeListFragment";
+    private static final int PERMISSION_REQUEST_CODE = 1;
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
     private Spinner mSpinnerSortOptions;
     private ArrayAdapter<CharSequence> mSpinnerSortOptionsAdapter;
+    private LocationManager mLocationManager;
+    private Location mLastKnownLocation;
+    private boolean mLocationPermissionGranted;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -39,6 +51,41 @@ public class EarthquakeListFragment extends ChildFragment {
 
     public static EarthquakeListFragment newInstance() {
         return new EarthquakeListFragment();
+    }
+
+    @Override
+    public void onCreate(@android.support.annotation.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        updateLastKnownLocation();
+    }
+
+    private void updateLastKnownLocation() {
+        // We don't need better than coarse grained, as the earthquakes are quite spread out, that
+        // level of accuracy isn't needed.
+        Activity activity = Objects.requireNonNull(getActivity());
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Toast.makeText(activity, "Location permission needed to sort by nearest", Toast.LENGTH_SHORT).show();
+            } else {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+            }
+        } else {
+            mLastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                updateLastKnownLocation();
+            } else {
+                Toast.makeText(getActivity(), "Location permission not granted :(", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -108,17 +155,19 @@ public class EarthquakeListFragment extends ChildFragment {
     }
 
     private List<Earthquake> sortEarthquakeList(String sortOption) {
-        if (sortOption.equalsIgnoreCase("nearest")) {
-            return mEarthquakeRepository.getEarthquakesByNearest(55.746310, -4.182994);
+        if (sortOption.equalsIgnoreCase("nearest") && mLastKnownLocation != null) {
+            return mEarthquakeRepository.getEarthquakesByNearest(
+                    mLastKnownLocation.getLatitude(),
+                    mLastKnownLocation.getLongitude());
         } else if (sortOption.equalsIgnoreCase("date")) {
             return mEarthquakeRepository.getEarthquakesByDate();
         } else if (sortOption.equalsIgnoreCase("title")) {
             return mEarthquakeRepository.getEarthquakesByTitle();
         } else if (sortOption.equalsIgnoreCase("depth")) {
             return mEarthquakeRepository.getEarthquakesByDepth();
-        }else if (sortOption.equalsIgnoreCase("magnitude")) {
+        } else if (sortOption.equalsIgnoreCase("magnitude")) {
             return mEarthquakeRepository.getEarthquakesByMagnitude();
-        }else {
+        } else {
             return Lists.newArrayList();
         }
     }

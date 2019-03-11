@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.alexmcbride.android.seismologyapp.Util;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -102,37 +103,18 @@ public class EarthquakeRepository implements AutoCloseable {
         }
         return earthquakes;
     }
-    public static final double R = 6372.8; // In kilometers
-
-    // get distance between to locations.
-    private static double haversine(double lat1, double lon1, double lat2, double lon2) {
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        lat1 = Math.toRadians(lat1);
-        lat2 = Math.toRadians(lat2);
-        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-        return R * c;
-    }
 
     public List<Earthquake> getEarthquakesByNearest(final double currentLat, final double currentLon) {
         List<Earthquake> earthquakes = getEarthquakes();
         Collections.sort(earthquakes, new Comparator<Earthquake>() {
             @Override
             public int compare(Earthquake earthquakeA, Earthquake earthquakeB) {
-                double distanceA = haversine(currentLat, currentLon, earthquakeA.getLat(), earthquakeA.getLon());
-                double distanceB = haversine(currentLat, currentLon, earthquakeB.getLat(), earthquakeB.getLon());
+                double distanceA = Util.haversine(currentLat, currentLon, earthquakeA.getLat(), earthquakeA.getLon());
+                double distanceB = Util.haversine(currentLat, currentLon, earthquakeB.getLat(), earthquakeB.getLon());
                 return Double.compare(distanceA, distanceB);
             }
         });
         return earthquakes;
-    }
-
-    public CloseableCursor getEarthquakesCursor() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null, null,
-                null, null, null);
-        return new CloseableCursor(db, cursor);
     }
 
     public Earthquake getEarthquake(long id) {
