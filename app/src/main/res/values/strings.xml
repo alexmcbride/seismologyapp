@@ -19,4 +19,5 @@
     <string name="earthquake_list_item_category">Category: %s</string>
     <string name="earthquake_list_item_latitude">Latitude: %f</string>
     <string name="earthquake_list_item_longitude">Longitude: %f</string>
+    <string name="no_earthquakes_message">No earthquakes to display</string>
 </resources>
