@@ -152,23 +152,28 @@ public class EarthquakeDetailFragment extends ChildFragment {
         if (mEarthquake == null) {
             return;
         }
+
         mTextLocation.setText(mEarthquake.getLocation());
-        mTextPubDate.setText("Date: " + Util.formatPretty(mEarthquake.getPubDate()));
+        mTextPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
         mTextMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
-        mTextDepth.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getDepth()));
-        mTextCategory.setText("Category: " + mEarthquake.getCategory());
-        mTextLat.setText("Latitude: " + mEarthquake.getLat());
-        mTextLon.setText("Longitude: " + mEarthquake.getLon());
+        mTextDepth.setText(getString(R.string.earthquake_list_item_depth, mEarthquake.getDepth()));
+        mTextCategory.setText(getString(R.string.earthquake_list_item_category, mEarthquake.getCategory()));
+        mTextLat.setText(getString(R.string.earthquake_list_item_latitude, mEarthquake.getLat()));
+        mTextLon.setText(getString(R.string.earthquake_list_item_longitude, mEarthquake.getLon()));
+
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
+                // Get location.
                 LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
 
+                // Add marker
                 MarkerOptions options = new MarkerOptions();
                 options.position(latLng);
                 options.title(mEarthquake.getLocation());
                 Marker marker = googleMap.addMarker(options);
 
+                // Move marker to location.
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
             }
         });
