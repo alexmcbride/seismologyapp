@@ -72,11 +72,11 @@ public class EarthquakeDetailFragment extends ChildFragment {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
         mMapView = view.findViewById(R.id.mapView);
-        mMapView.onCreate(mapViewBundle);
+        mMapView.onCreate(mapViewBundle); // We need to manually call all of these :/
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
-                // Get location.
+                // Get location
                 LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
 
                 // Add marker
@@ -85,7 +85,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
                 options.title(mEarthquake.getLocation());
                 Marker marker = googleMap.addMarker(options);
 
-                // Move marker to location.
+                // Move camera to marker.
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
             }
         });
@@ -124,7 +124,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // We need to pass all these on to the map view.
+        // We need to manually all these on the map view.
         mMapView.onDestroy();
     }
 

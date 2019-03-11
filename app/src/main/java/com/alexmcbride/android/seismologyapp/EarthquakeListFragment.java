@@ -147,7 +147,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        updateLastLocation();
+        earthquakesUpdated();
     }
 
     @Override
