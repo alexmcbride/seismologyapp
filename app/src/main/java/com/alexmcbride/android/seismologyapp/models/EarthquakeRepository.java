@@ -62,10 +62,6 @@ public class EarthquakeRepository implements AutoCloseable {
         }
     }
 
-    public List<Earthquake> getEarthquakes() {
-        return getEarthquakesInternal(null);
-    }
-
     private static String getAscOrDesc(boolean ascending) {
         return ascending ? "ASC" : "DESC";
     }
@@ -88,7 +84,7 @@ public class EarthquakeRepository implements AutoCloseable {
 
     public List<Earthquake> getEarthquakesByNearest(double currentLat, double currentLon, boolean ascending) {
         // Can't do this with query, so just sort them with a comparator.
-        List<Earthquake> earthquakes = getEarthquakes();
+        List<Earthquake> earthquakes = getEarthquakesInternal(null);
         Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon, ascending));
         return earthquakes;
     }
@@ -96,9 +92,10 @@ public class EarthquakeRepository implements AutoCloseable {
     private List<Earthquake> getEarthquakesInternal(String orderBy) {
         List<Earthquake> earthquakes = Lists.newArrayList();
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
-             Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null, null, null, null, orderBy)) {
-            EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null,
+                     null, null, null, orderBy)) {
             if (cursor.moveToFirst()) {
+                EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
                 do {
                     earthquakes.add(cursorWrapper.getEarthquake());
                 } while (cursor.moveToNext());
@@ -122,7 +119,7 @@ public class EarthquakeRepository implements AutoCloseable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         mDbHelper.close();
     }
 }

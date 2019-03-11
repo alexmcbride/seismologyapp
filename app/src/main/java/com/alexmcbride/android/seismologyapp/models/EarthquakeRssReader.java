@@ -26,7 +26,7 @@ public class EarthquakeRssReader {
     }
 
     /*
-     * Parse the XML stream into a list of earthquakes.
+     * Parse the stream into a list of earthquakes.
      */
     private List<Earthquake> parseXml(InputStream source) throws XmlPullParserException, IOException, ParseException {
         List<Earthquake> earthquakes = Lists.newArrayList();

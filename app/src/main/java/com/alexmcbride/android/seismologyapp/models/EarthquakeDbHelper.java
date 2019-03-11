@@ -6,11 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import javax.annotation.Nullable;
 
-public class EarthquakeDbHelper extends SQLiteOpenHelper {
+class EarthquakeDbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "earthquake-db";
     private static final int DB_VERSION = 16;
 
-    public EarthquakeDbHelper(@Nullable Context context) {
+    EarthquakeDbHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
