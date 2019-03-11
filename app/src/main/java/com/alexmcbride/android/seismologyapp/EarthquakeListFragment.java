@@ -43,7 +43,6 @@ public class EarthquakeListFragment extends ChildFragment {
     private ArrayAdapter<CharSequence> mSpinnerSortOptionsAdapter;
     private LocationManager mLocationManager;
     private Location mLastKnownLocation;
-    private boolean mLocationPermissionGranted;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -63,11 +62,12 @@ public class EarthquakeListFragment extends ChildFragment {
 
     private void updateLastKnownLocation() {
         // We don't need better than coarse grained, as the earthquakes are quite spread out, that
-        // level of accuracy isn't needed.
+        // level of accuracy isn't needed. Also we don't both to update the location for the same
+        // reason.
         Activity activity = Objects.requireNonNull(getActivity());
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Toast.makeText(activity, "Location permission needed to sort by nearest", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, getString(R.string.location_permission_explanation), Toast.LENGTH_SHORT).show();
             } else {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
             }
@@ -83,7 +83,7 @@ public class EarthquakeListFragment extends ChildFragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 updateLastKnownLocation();
             } else {
-                Toast.makeText(getActivity(), "Location permission not granted :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -113,7 +113,6 @@ public class EarthquakeListFragment extends ChildFragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
         });
 
@@ -129,8 +128,7 @@ public class EarthquakeListFragment extends ChildFragment {
 
     @Override
     public Bundle getSavedState() {
-        Bundle state = new Bundle();
-        return state;
+        return new Bundle();
     }
 
     @Override
@@ -168,7 +166,7 @@ public class EarthquakeListFragment extends ChildFragment {
         } else if (sortOption.equalsIgnoreCase("magnitude")) {
             return mEarthquakeRepository.getEarthquakesByMagnitude();
         } else {
-            return Lists.newArrayList();
+            return Lists.newArrayList(); // nothing
         }
     }
 
@@ -190,10 +188,10 @@ public class EarthquakeListFragment extends ChildFragment {
             ((TextView) convertView.findViewById(R.id.textLocation)).setText(earthquake.getLocation());
             ((TextView) convertView.findViewById(R.id.textDate)).setText(Util.formatPretty(earthquake.getPubDate()));
 
-            String depth = "Depth: " + String.format(Locale.ENGLISH, "%.0f", earthquake.getDepth()) + " km";
+            String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             ((TextView) convertView.findViewById(R.id.textDepth)).setText(depth);
 
-            String magnitude = "Magnitude: " + String.format(Locale.ENGLISH, "%.2f", earthquake.getMagnitude());
+            String magnitude = getString(R.string.earthquake_list_item_manitude, earthquake.getMagnitude());
             ((TextView) convertView.findViewById(R.id.textMagnitude)).setText(magnitude);
 
             return convertView;
