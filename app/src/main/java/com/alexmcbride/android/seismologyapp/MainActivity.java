@@ -57,20 +57,20 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Create out parent fragments.
+        // Create fragments for the view pager.
         mSearchMasterDetailFragment = SearchMasterDetailFragment.newInstance();
         mListMasterDetailFragment = ListMasterDetailFragment.newInstance();
         mEarthquakeMapFragment = EarthquakeMapFragment.newInstance();
 
-        // Add tabs to our adapter.
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        sectionsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
-        sectionsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
-        sectionsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
+        // Add fragments to adapter.
+        FragmentsPagerAdapter fragmentsPagerAdapter = new FragmentsPagerAdapter(getSupportFragmentManager());
+        fragmentsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
+        fragmentsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
+        fragmentsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
 
-        // Set up the ViewPager with the sections adapter.
+        // Set up the ViewPager with the fragment adapter.
         mViewPager = findViewById(R.id.container);
-        mViewPager.setAdapter(sectionsPagerAdapter);
+        mViewPager.setAdapter(fragmentsPagerAdapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -234,10 +234,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // Manages out collection of tab pages.
-    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private class FragmentsPagerAdapter extends FragmentPagerAdapter {
         private List<Page> mPageList = Lists.newArrayList();
 
-        SectionsPagerAdapter(FragmentManager fm) {
+        FragmentsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
