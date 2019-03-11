@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <TextView
-        android:id="@+id/textTitle"
+        android:id="@+id/textLocation"
+        style="@style/TextAppearance.MaterialComponents.Headline6"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="Newdigate, Surrey" />
+
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textLocation"
+        android:layout_marginEnd="16dp"
+        tools:text="28 Feb 2019 05:39" />
+
+    <TextView
+        android:id="@+id/textDepth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textLocation"
+        android:layout_marginEnd="16dp"
+        android:layout_toEndOf="@id/textDate"
+        tools:text="2K Depth" />
+
+    <TextView
+        android:id="@+id/textMagnitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textLocation"
+        android:layout_toEndOf="@id/textDepth"
+        tools:text="1.5 magnitude" />
 </RelativeLayout>

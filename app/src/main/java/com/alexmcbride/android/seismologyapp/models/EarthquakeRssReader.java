@@ -1,5 +1,6 @@
 package com.alexmcbride.android.seismologyapp.models;
 
+import com.alexmcbride.android.seismologyapp.Util;
 import com.google.common.collect.Lists;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -42,7 +43,7 @@ public class EarthquakeRssReader {
                 }
 
                 if (earthquake != null) {
-                    getEarthquakeElement(parser, earthquake, name);
+                    parseEarthquakeElement(parser, earthquake, name);
                 }
             }
 
@@ -57,11 +58,13 @@ public class EarthquakeRssReader {
         return earthquakes;
     }
 
-    private void getEarthquakeElement(XmlPullParser parser, Earthquake earthquake, String name) throws IOException, XmlPullParserException, ParseException {
+    private void parseEarthquakeElement(XmlPullParser parser, Earthquake earthquake, String name) throws IOException, XmlPullParserException, ParseException {
         if (name.equalsIgnoreCase("title")) {
             earthquake.setTitle(parser.nextText());
         } else if (name.equalsIgnoreCase("description")) {
-            earthquake.setDescription(parser.nextText());
+            String description = parser.nextText();
+            earthquake.setDescription(description);
+            parseDescription(earthquake, description);
         } else if (name.equalsIgnoreCase("link")) {
             earthquake.setLink(parser.nextText());
         } else if (name.equalsIgnoreCase("category")) {
@@ -72,6 +75,30 @@ public class EarthquakeRssReader {
             earthquake.setLon(Double.parseDouble(parser.nextText()));
         } else if (name.equalsIgnoreCase("pubDate")) {
             earthquake.setPubDate(PUB_DATE_FORMAT.parse(parser.nextText()));
+        }
+    }
+
+    private void parseDescription(Earthquake earthquake, String description) {
+        String[] tokens = description.split(" ; ");
+        for (String token : tokens) {
+            String[] keyValue = token.split(": ", 2);
+            if (keyValue.length == 2) {
+                if (keyValue[0].equalsIgnoreCase("Location")) {
+                    String[] locationTokens = keyValue[1].split(",");
+                    if (locationTokens.length > 1) {
+                        earthquake.setLocation(Util.capitalize(locationTokens[0]) + ", " + Util.capitalize(locationTokens[1]));
+                    } else {
+                        earthquake.setLocation(Util.capitalize(keyValue[1]));
+                    }
+                } else if (keyValue[0].equalsIgnoreCase("Depth")) {
+                    String[] depthTokens = keyValue[1].split(" ", 2);
+                    if (depthTokens.length == 2) {
+                        earthquake.setDepth(Double.parseDouble(depthTokens[0]));
+                    }
+                } else if (keyValue[0].equalsIgnoreCase("Magnitude")) {
+                    earthquake.setMagnitude(Double.parseDouble(keyValue[1]));
+                }
+            }
         }
     }
 }

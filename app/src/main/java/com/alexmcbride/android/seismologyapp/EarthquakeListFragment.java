@@ -4,19 +4,22 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.alexmcbride.android.seismologyapp.models.CloseableCursor;
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeCursorWrapper;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
+
+import java.util.Locale;
 
 /*
  * Fragment used to select a list of earthquakes.
@@ -46,6 +49,22 @@ public class EarthquakeListFragment extends ChildFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 mListener.onEarthquakeSelected(id);
+            }
+        });
+
+        Spinner spinnerSortOptions = view.findViewById(R.id.spinnerSortOptions);
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSortOptions.setAdapter(adapter);
+        spinnerSortOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -109,8 +128,15 @@ public class EarthquakeListFragment extends ChildFragment {
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             Earthquake earthquake = mCursorWrapper.getEarthquake();
-            TextView textTitle = view.findViewById(R.id.textTitle);
-            textTitle.setText(earthquake.getTitle());
+
+            ((TextView) view.findViewById(R.id.textLocation)).setText(earthquake.getLocation());
+            ((TextView) view.findViewById(R.id.textDate)).setText(Util.formatPretty(earthquake.getPubDate()));
+
+            String depth = "Depth: " +  String.format(Locale.ENGLISH, "%.0f", earthquake.getDepth()) + " km";
+            ((TextView) view.findViewById(R.id.textDepth)).setText(depth);
+
+            String magnitude = "Magnitude: " +  String.format(Locale.ENGLISH, "%.2f", earthquake.getMagnitude());
+            ((TextView) view.findViewById(R.id.textMagnitude)).setText(magnitude);
         }
     }
 

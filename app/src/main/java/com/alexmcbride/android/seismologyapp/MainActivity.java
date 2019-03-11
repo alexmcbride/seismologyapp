@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
-        startDownloadTask();
+//        startDownloadTask();
     }
 
     @Override

@@ -61,6 +61,9 @@ public class EarthquakeRepository implements AutoCloseable {
         contentValues.put("category", earthquake.getCategory());
         contentValues.put("lat", earthquake.getLat());
         contentValues.put("lon", earthquake.getLon());
+        contentValues.put("location", earthquake.getLocation());
+        contentValues.put("depth", earthquake.getDepth());
+        contentValues.put("magnitude", earthquake.getMagnitude());
         return contentValues;
     }
 

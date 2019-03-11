@@ -19,6 +19,9 @@ public class EarthquakeCursorWrapper extends android.database.CursorWrapper {
         earthquake.setCategory(getString(5));
         earthquake.setLat(getDouble(6));
         earthquake.setLon(getDouble(7));
+        earthquake.setLocation(getString(8));
+        earthquake.setDepth(getDouble(9));
+        earthquake.setMagnitude(getDouble(10));
         return earthquake;
     }
 }
