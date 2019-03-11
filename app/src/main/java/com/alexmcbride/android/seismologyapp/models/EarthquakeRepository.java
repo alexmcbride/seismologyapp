@@ -106,14 +106,7 @@ public class EarthquakeRepository implements AutoCloseable {
 
     public List<Earthquake> getEarthquakesByNearest(final double currentLat, final double currentLon) {
         List<Earthquake> earthquakes = getEarthquakes();
-        Collections.sort(earthquakes, new Comparator<Earthquake>() {
-            @Override
-            public int compare(Earthquake earthquakeA, Earthquake earthquakeB) {
-                double distanceA = Util.haversine(currentLat, currentLon, earthquakeA.getLat(), earthquakeA.getLon());
-                double distanceB = Util.haversine(currentLat, currentLon, earthquakeB.getLat(), earthquakeB.getLon());
-                return Double.compare(distanceA, distanceB);
-            }
-        });
+        Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon));
         return earthquakes;
     }
 

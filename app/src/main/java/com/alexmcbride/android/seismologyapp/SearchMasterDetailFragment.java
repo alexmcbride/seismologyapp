@@ -11,7 +11,6 @@ import java.util.Date;
  */
 public class SearchMasterDetailFragment extends MasterDetailFragment implements SearchEarthquakesFragment.OnFragmentInteractionListener {
     private SearchEarthquakesFragment mSearchEarthquakesFragment;
-    private SearchResultsFragment mSearchResultsFragment;
     private OnFragmentInteractionListener mListener;
 
     public SearchMasterDetailFragment() {
