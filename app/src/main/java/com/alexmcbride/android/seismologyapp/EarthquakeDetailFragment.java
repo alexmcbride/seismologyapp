@@ -12,7 +12,7 @@ import android.widget.TextView;
 /*
  * Fragment used to display the details of a single earthquake.
  */
-public class EarthquakeDetailFragment extends Fragment implements ChildFragment {
+public class EarthquakeDetailFragment extends ChildFragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
     private TextView mTextView;
     private long mCurrentId;

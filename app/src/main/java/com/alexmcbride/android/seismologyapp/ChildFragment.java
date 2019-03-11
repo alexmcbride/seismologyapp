@@ -1,12 +1,13 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 /*
- * Interface to represent a child fragment saving its state. Fragments inside of a parent fragment
- * don't get their bundles saved automatically, so we need to do it for them.
+ * Abstract class to represent a child fragment. Fragments inside of a parent fragment don't get
+ * their bundles saved automatically, so we need to do it for them.
  */
-public interface ChildFragment {
-    Bundle getSavedState();
-    void loadSavedState(Bundle bundle);
+public abstract class ChildFragment extends Fragment {
+    public abstract Bundle getSavedState();
+    public abstract void loadSavedState(Bundle bundle);
 }

@@ -21,7 +21,7 @@ import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
 /*
  * Fragment used to select a list of earthquakes.
  */
-public class EarthquakeListFragment extends Fragment implements ChildFragment {
+public class EarthquakeListFragment extends ChildFragment {
     private static final String TAG = "EarthquakeListFragment";
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;

@@ -14,7 +14,7 @@ import java.util.Date;
 /*
  * Fragment used to show the results of a search.
  */
-public class SearchResultsFragment extends Fragment implements ChildFragment {
+public class SearchResultsFragment extends ChildFragment {
     private static final String ARG_START_TIME = "ARG_START_TIME";
     private static final String ARG_END_TIME = "ARG_END_TIME";
     private Date mStartDate;
