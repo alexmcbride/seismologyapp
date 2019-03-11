@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // Manages out collection of tab pages.
+    // Manages collection fragments for the view pager.
     private class FragmentsPagerAdapter extends FragmentPagerAdapter {
         private List<Page> mPageList = Lists.newArrayList();
 

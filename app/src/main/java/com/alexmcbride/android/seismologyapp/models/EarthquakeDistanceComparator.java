@@ -28,15 +28,10 @@ class EarthquakeDistanceComparator implements Comparator<Earthquake> {
     }
 
     @Override
-    public int compare(Earthquake earthquakeA, Earthquake earthquakeB) {
-        double distanceA = haversine(mCurrentLat, mCurrentLon, earthquakeA.getLat(), earthquakeA.getLon());
-        double distanceB = haversine(mCurrentLat, mCurrentLon, earthquakeB.getLat(), earthquakeB.getLon());
-
-        if (mAscending) {
-            return Double.compare(distanceA, distanceB);
-        } else {
-            return Double.compare(distanceB, distanceA);
-        }
+    public int compare(Earthquake a, Earthquake b) {
+        double distanceA = haversine(mCurrentLat, mCurrentLon, a.getLat(), a.getLon());
+        double distanceB = haversine(mCurrentLat, mCurrentLon, b.getLat(), b.getLon());
+        return mAscending ? Double.compare(distanceA, distanceB) : Double.compare(distanceB, distanceA);
     }
 }
 

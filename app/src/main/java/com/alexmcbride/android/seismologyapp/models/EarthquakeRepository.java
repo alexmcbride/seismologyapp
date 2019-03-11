@@ -23,7 +23,7 @@ public class EarthquakeRepository implements AutoCloseable {
     }
 
     /*
-     * Adds list of earthquakes to the database and returns a list of those successfully added.
+     * Adds list of earthquakes to the database and returns list of new ones.
      */
     public List<Earthquake> addEarthquakes(List<Earthquake> earthquakes) {
         List<Earthquake> added = Lists.newArrayList();
@@ -42,7 +42,7 @@ public class EarthquakeRepository implements AutoCloseable {
      */
     private boolean addEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
-            ContentValues contentValues = getContentValues(earthquake);
+            ContentValues contentValues = EarthquakeCursorWrapper.getContentValues(earthquake);
             long id = db.insertWithOnConflict(EARTHQUAKES_TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
             if (id > -1) {
                 earthquake.setId(id);
@@ -55,26 +55,11 @@ public class EarthquakeRepository implements AutoCloseable {
 
     public boolean updateEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
-            ContentValues contentValues = getContentValues(earthquake);
+            ContentValues contentValues = EarthquakeCursorWrapper.getContentValues(earthquake);
             long affected = db.update(EARTHQUAKES_TABLE, contentValues, "_id=?",
                     new String[]{String.valueOf(earthquake.getId())});
             return affected > 0;
         }
-    }
-
-    private ContentValues getContentValues(Earthquake earthquake) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("title", earthquake.getTitle());
-        contentValues.put("description", earthquake.getDescription());
-        contentValues.put("link", earthquake.getLink());
-        contentValues.put("pubDate", earthquake.getPubDate().getTime());
-        contentValues.put("category", earthquake.getCategory());
-        contentValues.put("lat", earthquake.getLat());
-        contentValues.put("lon", earthquake.getLon());
-        contentValues.put("location", earthquake.getLocation());
-        contentValues.put("depth", earthquake.getDepth());
-        contentValues.put("magnitude", earthquake.getMagnitude());
-        return contentValues;
     }
 
     public List<Earthquake> getEarthquakes() {
