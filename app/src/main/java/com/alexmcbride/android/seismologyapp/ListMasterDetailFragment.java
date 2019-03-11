@@ -51,9 +51,13 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
 
     @Override
     public void onEarthquakeSelected(long id) {
+        // If we have a details container, tell the fragment to update itself?
+        // Or, do we load in a fresh fragment at this point?
         if (hasDetailsContainer()) {
-            mEarthquakeDetailFragment.updateEarthquake(id);
+            Fragment fragment = EarthquakeDetailFragment.newInstance(id);
+            replaceDetailsFragment(fragment);
         } else {
+            // Tell main activity to start a new details activity.
             mListener.onEarthquakeSelected(id);
         }
     }

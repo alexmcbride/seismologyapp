@@ -2,11 +2,10 @@ package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 
 import java.util.Objects;
 
@@ -16,7 +15,6 @@ import java.util.Objects;
  */
 public class EarthquakeDetailActivity extends AppCompatActivity {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
-    private static final String TAG = "EarthquakeDetailActivit";
 
     public static Intent newInstance(Context context, long id) {
         Intent intent = new Intent(context, EarthquakeDetailActivity.class);
@@ -29,18 +27,17 @@ public class EarthquakeDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake_detail);
 
-        Intent intent = getIntent();
-        long id = intent.getLongExtra(ARG_EARTHQUAKE_ID, -1);
-
+        // Load earthquake to view.
         if (savedInstanceState == null) {
+            // Get ID of earthquake to display.
+            Intent intent = getIntent();
+            long id = intent.getLongExtra(ARG_EARTHQUAKE_ID, -1);
+
+            // Load fragment.
             Fragment fragment = EarthquakeDetailFragment.newInstance(id);
-            try {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .commitNow();
-            }catch(Exception e){
-                Log.d(TAG, e.toString());
-            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commitNow();
         }
 
         ActionBar actionBar = getSupportActionBar();

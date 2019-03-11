@@ -61,7 +61,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
         mTextLat = view.findViewById(R.id.textLat);
         mTextLon = view.findViewById(R.id.textLon);
 
-        // Init map (with state)
+        // Init map view (with bundle state)
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
@@ -69,7 +69,33 @@ public class EarthquakeDetailFragment extends ChildFragment {
         mMapView = view.findViewById(R.id.mapView);
         mMapView.onCreate(mapViewBundle);
 
-        updateEarthquake();
+        if (mEarthquake != null) {
+            mTextLocation.setText(mEarthquake.getLocation());
+            mTextPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
+            mTextMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
+            mTextDepth.setText(getString(R.string.earthquake_list_item_depth, mEarthquake.getDepth()));
+            mTextCategory.setText(getString(R.string.earthquake_list_item_category, mEarthquake.getCategory()));
+            mTextLat.setText(getString(R.string.earthquake_list_item_latitude, mEarthquake.getLat()));
+            mTextLon.setText(getString(R.string.earthquake_list_item_longitude, mEarthquake.getLon()));
+
+            // Load map
+            mMapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    // Get location.
+                    LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
+
+                    // Add marker
+                    MarkerOptions options = new MarkerOptions();
+                    options.position(latLng);
+                    options.title(mEarthquake.getLocation());
+                    Marker marker = googleMap.addMarker(options);
+
+                    // Move marker to location.
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
+                }
+            });
+        }
 
         return view;
     }
@@ -94,7 +120,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
 
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
 
-        // Load the earthquake we want to show details for.
+        // Get earthquake we want to show details for.
         Bundle args = getArguments();
         if (args != null) {
             long id = args.getLong(ARG_EARTHQUAKE_ID, -1);
@@ -141,41 +167,5 @@ public class EarthquakeDetailFragment extends ChildFragment {
     @Override
     public void loadSavedState(Bundle bundle) {
 
-    }
-
-    void updateEarthquake(long id) {
-        mEarthquake = mEarthquakeRepository.getEarthquake(id);
-        updateEarthquake();
-    }
-
-    private void updateEarthquake() {
-        if (mEarthquake == null) {
-            return;
-        }
-
-        mTextLocation.setText(mEarthquake.getLocation());
-        mTextPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
-        mTextMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
-        mTextDepth.setText(getString(R.string.earthquake_list_item_depth, mEarthquake.getDepth()));
-        mTextCategory.setText(getString(R.string.earthquake_list_item_category, mEarthquake.getCategory()));
-        mTextLat.setText(getString(R.string.earthquake_list_item_latitude, mEarthquake.getLat()));
-        mTextLon.setText(getString(R.string.earthquake_list_item_longitude, mEarthquake.getLon()));
-
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                // Get location.
-                LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
-
-                // Add marker
-                MarkerOptions options = new MarkerOptions();
-                options.position(latLng);
-                options.title(mEarthquake.getLocation());
-                Marker marker = googleMap.addMarker(options);
-
-                // Move marker to location.
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
-            }
-        });
     }
 }

@@ -19,6 +19,7 @@ public abstract class MasterDetailFragment extends Fragment {
     }
 
     protected abstract Fragment getMasterFragment();
+
     protected abstract Fragment getDetailsFragment();
 
     boolean hasDetailsContainer() {
@@ -47,17 +48,14 @@ public abstract class MasterDetailFragment extends Fragment {
         // Load details fragment if the details container exists. This will only exist in landscape
         // mode.
         mHasDetailsContainer = view.findViewById(R.id.containerDetail) != null;
-        if (mHasDetailsContainer) {
-            Fragment detailFragment = getDetailsFragment();
-            fragmentManager.beginTransaction().replace(R.id.containerDetail, detailFragment).commitNow();
-
-            // Tell details fragment to load its state.
-            if (savedInstanceState != null) {
-                ((ChildFragment) detailFragment).loadSavedState(savedInstanceState);
-            }
-        }
 
         return view;
+    }
+
+    protected void replaceDetailsFragment(Fragment fragment) {
+        if (mHasDetailsContainer) {
+            getChildFragmentManager().beginTransaction().replace(R.id.containerDetail, fragment).commitNow();
+        }
     }
 
     @Override

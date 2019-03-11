@@ -57,7 +57,8 @@ public class EarthquakeListFragment extends ChildFragment {
         super.onCreate(savedInstanceState);
 
         // We need to know the user's location for the sort by nearest option.
-        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Activity activity = Objects.requireNonNull(getActivity());
+        mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         updateLastKnownLocation();
     }
 
@@ -150,12 +151,12 @@ public class EarthquakeListFragment extends ChildFragment {
     }
 
     private void earthquakesUpdated(String sortOption) {
-        List<Earthquake> earthquakes = sortEarthquakeList(sortOption);
+        List<Earthquake> earthquakes = getSortedEarthquakes(sortOption);
         mEarthquakesAdapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
         mListEarthquakes.setAdapter(mEarthquakesAdapter);
     }
 
-    private List<Earthquake> sortEarthquakeList(String sortOption) {
+    private List<Earthquake> getSortedEarthquakes(String sortOption) {
         if (sortOption.equalsIgnoreCase("nearest") && mLastKnownLocation != null) {
             return mEarthquakeRepository.getEarthquakesByNearest(
                     mLastKnownLocation.getLatitude(),
