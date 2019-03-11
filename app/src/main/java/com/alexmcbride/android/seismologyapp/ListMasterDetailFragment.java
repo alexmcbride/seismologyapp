@@ -1,7 +1,6 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 
 /*
  * Fragment to represent the earthquake list/detail view. In portrait only list is shown, in landscape
@@ -9,20 +8,19 @@ import android.support.v4.app.Fragment;
  */
 public class ListMasterDetailFragment extends MasterDetailFragment implements EarthquakeListFragment.OnFragmentInteractionListener {
     private EarthquakeListFragment mEarthquakeListFragment;
-    private EarthquakeDetailFragment mEarthquakeDetailFragment;
     private OnFragmentInteractionListener mListener;
 
+    public static ListMasterDetailFragment newInstance() {
+        return new ListMasterDetailFragment();
+    }
+
     @Override
-    protected Fragment getMasterFragment() {
+    protected ChildFragment getMasterFragment() {
         if (mEarthquakeListFragment == null) {
             mEarthquakeListFragment = EarthquakeListFragment.newInstance();
             mEarthquakeListFragment.setListener(this);
         }
         return mEarthquakeListFragment;
-    }
-
-    public static ListMasterDetailFragment newInstance() {
-        return new ListMasterDetailFragment();
     }
 
     @Override
@@ -43,8 +41,10 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
 
     @Override
     public void onEarthquakeSelected(long id) {
+        // If details container present then update that. Otherwise tell the MainActivity to deal
+        // with request.
         if (hasDetailsContainer()) {
-            Fragment fragment = EarthquakeDetailFragment.newInstance(id);
+            EarthquakeDetailFragment fragment = EarthquakeDetailFragment.newInstance(id);
             updateDetailsContainer(fragment);
         } else {
             // Tell main activity to start a new details activity.
@@ -52,6 +52,9 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
         }
     }
 
+    /*
+     * Called when the earthquakes in the DB have changed, tell child fragment to update.
+     */
     void earthquakesUpdated() {
         mEarthquakeListFragment.earthquakesUpdated();
     }

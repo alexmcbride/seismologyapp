@@ -3,6 +3,7 @@ package com.alexmcbride.android.seismologyapp;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -33,8 +34,8 @@ import javax.annotation.Nullable;
  * Fragment used to select a list of earthquakes.
  */
 public class EarthquakeListFragment extends ChildFragment {
-    private static final String TAG = "EarthquakeListFragment";
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final String ARG_SELECTED_SORT_OPTION = "ARG_SELECTED_SORT_OPTION";
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
@@ -53,7 +54,7 @@ public class EarthquakeListFragment extends ChildFragment {
     }
 
     @Override
-    public void onCreate(@android.support.annotation.Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // We need to know the user's location for the sort by nearest option.
@@ -99,7 +100,7 @@ public class EarthquakeListFragment extends ChildFragment {
         mListEarthquakes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Earthquake earthquake = mEarthquakesAdapter.getItem(position);
+                Earthquake earthquake = Objects.requireNonNull(mEarthquakesAdapter.getItem(position));
                 mListener.onEarthquakeSelected(earthquake.getId());
             }
         });
@@ -120,10 +121,25 @@ public class EarthquakeListFragment extends ChildFragment {
             }
         });
 
+        // Get spinner setting out of preferences.
+        SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
+        mSpinnerSortOptions.setSelection(preferences.getInt(ARG_SELECTED_SORT_OPTION, 0));
+
+        // Init DB and load earthquakes.
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
         earthquakesUpdated();
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerSortOptions.getSelectedItemPosition());
+        editor.apply();
     }
 
     void setListener(OnFragmentInteractionListener listener) {
@@ -160,15 +176,16 @@ public class EarthquakeListFragment extends ChildFragment {
         if (sortOption.equalsIgnoreCase("nearest") && mLastKnownLocation != null) {
             return mEarthquakeRepository.getEarthquakesByNearest(
                     mLastKnownLocation.getLatitude(),
-                    mLastKnownLocation.getLongitude());
+                    mLastKnownLocation.getLongitude(),
+                    true);
         } else if (sortOption.equalsIgnoreCase("date")) {
-            return mEarthquakeRepository.getEarthquakesByDate();
+            return mEarthquakeRepository.getEarthquakesByDate(true);
         } else if (sortOption.equalsIgnoreCase("title")) {
-            return mEarthquakeRepository.getEarthquakesByTitle();
+            return mEarthquakeRepository.getEarthquakesByTitle(true);
         } else if (sortOption.equalsIgnoreCase("depth")) {
-            return mEarthquakeRepository.getEarthquakesByDepth();
+            return mEarthquakeRepository.getEarthquakesByDepth(true);
         } else if (sortOption.equalsIgnoreCase("magnitude")) {
-            return mEarthquakeRepository.getEarthquakesByMagnitude();
+            return mEarthquakeRepository.getEarthquakesByMagnitude(true);
         } else {
             return Lists.newArrayList(); // nothing
         }

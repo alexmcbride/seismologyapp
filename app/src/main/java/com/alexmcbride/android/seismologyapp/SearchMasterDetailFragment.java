@@ -18,7 +18,7 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     }
 
     @Override
-    protected Fragment getMasterFragment() {
+    protected ChildFragment getMasterFragment() {
         if (mSearchEarthquakesFragment == null) {
             mSearchEarthquakesFragment = SearchEarthquakesFragment.newInstance();
             mSearchEarthquakesFragment.setListener(this);
@@ -49,7 +49,7 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
         if (hasDetailsContainer()) {
-            Fragment fragment = SearchResultsFragment.newInstance(start, end);
+            SearchResultsFragment fragment = SearchResultsFragment.newInstance(start, end);
             updateDetailsContainer(fragment);
         } else {
             mListener.onSearchEarthquakes(start, end);

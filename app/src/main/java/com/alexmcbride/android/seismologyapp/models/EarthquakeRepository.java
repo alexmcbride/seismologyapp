@@ -5,14 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.alexmcbride.android.seismologyapp.Util;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+/*
+ * Wrapper round the DB that handles inserting, updating, deleting, and querying.
+ */
 public class EarthquakeRepository implements AutoCloseable {
     private static final String EARTHQUAKES_TABLE = "earthquakes";
     private final EarthquakeDbHelper mDbHelper;
@@ -21,6 +22,9 @@ public class EarthquakeRepository implements AutoCloseable {
         mDbHelper = new EarthquakeDbHelper(context);
     }
 
+    /*
+     * Adds list of earthquakes to the database and returns a list of those successfully added.
+     */
     public List<Earthquake> addEarthquakes(List<Earthquake> earthquakes) {
         List<Earthquake> added = Lists.newArrayList();
         for (Earthquake earthquake : earthquakes) {
@@ -31,11 +35,14 @@ public class EarthquakeRepository implements AutoCloseable {
         return added;
     }
 
-    public boolean addEarthquake(Earthquake earthquake) {
+    /*
+     * Each earthquake has its own link to the BGS site, so we use that to check for uniqueness. We
+     * have a unique constraint setup on the link, so if a second is inserted then the method
+     * returns a -1.
+     */
+    private boolean addEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
-            // we have a unique constraint setup on links, so if a row doesn't get inserted it
-            // returns -1.
             long id = db.insertWithOnConflict(EARTHQUAKES_TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
             if (id > -1) {
                 earthquake.setId(id);
@@ -74,25 +81,30 @@ public class EarthquakeRepository implements AutoCloseable {
         return getEarthquakesInternal(null);
     }
 
-    public List<Earthquake> getEarthquakesByDate() {
-        return getEarthquakesInternal("pubDate ASC");
+    private static String getAscOrDesc(boolean ascending) {
+        return ascending ? "ASC" : "DESC";
     }
 
-    public List<Earthquake> getEarthquakesByTitle() {
-        return getEarthquakesInternal("location ASC");
+    public List<Earthquake> getEarthquakesByDate(boolean ascending) {
+        return getEarthquakesInternal("pubDate " + getAscOrDesc(ascending));
     }
 
-    public List<Earthquake> getEarthquakesByDepth() {
-        return getEarthquakesInternal("depth ASC");
+    public List<Earthquake> getEarthquakesByTitle(boolean ascending) {
+        return getEarthquakesInternal("location " + getAscOrDesc(ascending));
     }
 
-    public List<Earthquake> getEarthquakesByMagnitude() {
-        return getEarthquakesInternal("magnitude ASC");
+    public List<Earthquake> getEarthquakesByDepth(boolean ascending) {
+        return getEarthquakesInternal("depth " + getAscOrDesc(ascending));
     }
 
-    public List<Earthquake> getEarthquakesByNearest(final double currentLat, final double currentLon) {
+    public List<Earthquake> getEarthquakesByMagnitude(boolean ascending) {
+        return getEarthquakesInternal("magnitude " + getAscOrDesc(ascending));
+    }
+
+    public List<Earthquake> getEarthquakesByNearest(double currentLat, double currentLon, boolean ascending) {
+        // Can't do this with query, so just sort them with a comparator.
         List<Earthquake> earthquakes = getEarthquakes();
-        Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon));
+        Collections.sort(earthquakes, new EarthquakeDistanceComparator(currentLat, currentLon, ascending));
         return earthquakes;
     }
 

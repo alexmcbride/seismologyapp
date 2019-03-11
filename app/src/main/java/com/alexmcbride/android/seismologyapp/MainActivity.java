@@ -170,6 +170,10 @@ public class MainActivity extends AppCompatActivity implements
         mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, 0);
     }
 
+    private void startDownloadTaskDelayed() {
+        mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, UPDATE_DELAY_MILLIS);
+    }
+
     private void stopDownloadTask() {
         mUpdateHandler.removeCallbacks(mDownloadEarthquakesRunnable);
     }
@@ -186,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements
             new DownloadEarthquakesAsyncTask(mMainActivity).execute(UPDATE_URL);
 
             // Trigger next tick of timer.
-            mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, UPDATE_DELAY_MILLIS);
+            startDownloadTaskDelayed();
         }
     }
 

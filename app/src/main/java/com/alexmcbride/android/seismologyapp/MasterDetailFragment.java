@@ -9,16 +9,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /*
- * Abstract fragment to represent a master/detail relationship between child fragments.
+ * Abstract fragment to manage master/detail relationship between child fragments. When in portrait
+ * mode it shows only the master fragment. Inn landscape it shows with master and detail. Child
+ * classes implement their own functionality and call updateDetailsContainer() to update the
+ * current details fragment.
  */
 public abstract class MasterDetailFragment extends Fragment {
     private boolean mHasDetailsContainer;
+    private ChildFragment mDetailsFragment;
 
     public MasterDetailFragment() {
         // Required empty public constructor
     }
 
-    protected abstract Fragment getMasterFragment();
+    /*
+     * Overridden in child to provide the master fragment, which is always shown.
+     */
+    protected abstract ChildFragment getMasterFragment();
 
     boolean hasDetailsContainer() {
         return mHasDetailsContainer;
@@ -34,25 +41,28 @@ public abstract class MasterDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_master_detail, container, false);
 
         // Load master fragment into container.
-        Fragment masterFragment = getMasterFragment();
+        ChildFragment masterFragment = getMasterFragment();
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.containerMaster, masterFragment).commitNow();
 
         // Tell master fragment to load its state.
+        // todo: need to figure out way to tell detail to load state, but not needed right now.
         if (savedInstanceState != null) {
-            ((ChildFragment) masterFragment).loadSavedState(savedInstanceState);
+            masterFragment.loadSavedState(savedInstanceState);
         }
 
-        // Load details fragment if the details container exists. This will only exist in landscape
-        // mode.
+        // Details container will only exist when in portrait mode.
         mHasDetailsContainer = view.findViewById(R.id.containerDetail) != null;
 
         return view;
     }
 
-    protected void updateDetailsContainer(Fragment fragment) {
+    protected void updateDetailsContainer(ChildFragment fragment) {
         if (mHasDetailsContainer) {
-            getChildFragmentManager().beginTransaction().replace(R.id.containerDetail, fragment).commitNow();
+            mDetailsFragment = fragment;
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.containerDetail, fragment)
+                    .commitNow();
         }
     }
 
@@ -61,7 +71,18 @@ public abstract class MasterDetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
 
         // Tell child fragments to save their state to this bundle.
-        Bundle masterState = ((ChildFragment) getMasterFragment()).getSavedState();
-        outState.putAll(masterState);
+        Bundle masterState = getMasterFragment().getSavedState();
+        mergeBundles(masterState, outState);
+
+        if (mDetailsFragment != null) {
+            Bundle detailsState = mDetailsFragment.getSavedState();
+            mergeBundles(detailsState, outState);
+        }
+    }
+
+    private void mergeBundles(Bundle state, Bundle outState) {
+        if (state != null) {
+            outState.putAll(state);
+        }
     }
 }

@@ -25,16 +25,8 @@ public class EarthquakeDetailFragment extends ChildFragment {
     private static final String ARG_EARTHQUAKE_ID = "ARG_EARTHQUAKE_ID";
     private static final String MAP_VIEW_BUNDLE_KEY = "MAP_VIEW_BUNDLE_KEY";
     private static final float ZOOM_LEVEL = 14; // higher is closer
-    private EarthquakeRepository mEarthquakeRepository;
     private Earthquake mEarthquake;
     private MapView mMapView;
-    private TextView mTextLocation;
-    private TextView mTextPubDate;
-    private TextView mTextMagnitude;
-    private TextView mTextDepth;
-    private TextView mTextCategory;
-    private TextView mTextLat;
-    private TextView mTextLon;
 
     public static EarthquakeDetailFragment newInstance() {
         return new EarthquakeDetailFragment();
@@ -53,13 +45,26 @@ public class EarthquakeDetailFragment extends ChildFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_detail, container, false);
 
-        mTextLocation = view.findViewById(R.id.textLocation);
-        mTextPubDate = view.findViewById(R.id.textPubDate);
-        mTextMagnitude = view.findViewById(R.id.textMagnitude);
-        mTextDepth = view.findViewById(R.id.textDepth);
-        mTextCategory = view.findViewById(R.id.textCategory);
-        mTextLat = view.findViewById(R.id.textLat);
-        mTextLon = view.findViewById(R.id.textLon);
+        TextView textLocation = view.findViewById(R.id.textLocation);
+        textLocation.setText(mEarthquake.getLocation());
+
+        TextView textPubDate = view.findViewById(R.id.textPubDate);
+        textPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
+
+        TextView textMagnitude = view.findViewById(R.id.textMagnitude);
+        textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
+
+        TextView textDepth = view.findViewById(R.id.textDepth);
+        textDepth.setText(getString(R.string.earthquake_list_item_depth, mEarthquake.getDepth()));
+
+        TextView textCategory = view.findViewById(R.id.textCategory);
+        textCategory.setText(getString(R.string.earthquake_list_item_category, mEarthquake.getCategory()));
+
+        TextView textLat = view.findViewById(R.id.textLat);
+        textLat.setText(getString(R.string.earthquake_list_item_latitude, mEarthquake.getLat()));
+
+        TextView textLon = view.findViewById(R.id.textLon);
+        textLon.setText(getString(R.string.earthquake_list_item_longitude, mEarthquake.getLon()));
 
         // Init map view (with bundle state)
         Bundle mapViewBundle = null;
@@ -68,34 +73,22 @@ public class EarthquakeDetailFragment extends ChildFragment {
         }
         mMapView = view.findViewById(R.id.mapView);
         mMapView.onCreate(mapViewBundle);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                // Get location.
+                LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
 
-        if (mEarthquake != null) {
-            mTextLocation.setText(mEarthquake.getLocation());
-            mTextPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
-            mTextMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
-            mTextDepth.setText(getString(R.string.earthquake_list_item_depth, mEarthquake.getDepth()));
-            mTextCategory.setText(getString(R.string.earthquake_list_item_category, mEarthquake.getCategory()));
-            mTextLat.setText(getString(R.string.earthquake_list_item_latitude, mEarthquake.getLat()));
-            mTextLon.setText(getString(R.string.earthquake_list_item_longitude, mEarthquake.getLon()));
+                // Add marker
+                MarkerOptions options = new MarkerOptions();
+                options.position(latLng);
+                options.title(mEarthquake.getLocation());
+                Marker marker = googleMap.addMarker(options);
 
-            // Load map
-            mMapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    // Get location.
-                    LatLng latLng = new LatLng(mEarthquake.getLat(), mEarthquake.getLon());
-
-                    // Add marker
-                    MarkerOptions options = new MarkerOptions();
-                    options.position(latLng);
-                    options.title(mEarthquake.getLocation());
-                    Marker marker = googleMap.addMarker(options);
-
-                    // Move marker to location.
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
-                }
-            });
-        }
+                // Move marker to location.
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
+            }
+        });
 
         return view;
     }
@@ -118,13 +111,13 @@ public class EarthquakeDetailFragment extends ChildFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mEarthquakeRepository = new EarthquakeRepository(getActivity());
+        EarthquakeRepository earthquakeRepository = new EarthquakeRepository(getActivity());
 
         // Get earthquake we want to show details for.
         Bundle args = getArguments();
         if (args != null) {
             long id = args.getLong(ARG_EARTHQUAKE_ID, -1);
-            mEarthquake = mEarthquakeRepository.getEarthquake(id);
+            mEarthquake = earthquakeRepository.getEarthquake(id);
         }
     }
 
@@ -161,7 +154,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
 
     @Override
     public Bundle getSavedState() {
-        return new Bundle();
+        return null;
     }
 
     @Override

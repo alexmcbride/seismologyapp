@@ -9,10 +9,12 @@ class EarthquakeDistanceComparator implements Comparator<Earthquake> {
     private static final double R = 6372.8; // In kilometers
     private final double mCurrentLat;
     private final double mCurrentLon;
+    private final boolean mAscending;
 
-    EarthquakeDistanceComparator(double currentLat, double currentLon) {
+    EarthquakeDistanceComparator(double currentLat, double currentLon, boolean ascending) {
         mCurrentLat = currentLat;
         mCurrentLon = currentLon;
+        mAscending = ascending;
     }
 
     private static double haversine(double lat1, double lon1, double lat2, double lon2) {
@@ -29,7 +31,12 @@ class EarthquakeDistanceComparator implements Comparator<Earthquake> {
     public int compare(Earthquake earthquakeA, Earthquake earthquakeB) {
         double distanceA = haversine(mCurrentLat, mCurrentLon, earthquakeA.getLat(), earthquakeA.getLon());
         double distanceB = haversine(mCurrentLat, mCurrentLon, earthquakeB.getLat(), earthquakeB.getLon());
-        return Double.compare(distanceA, distanceB);
+
+        if (mAscending) {
+            return Double.compare(distanceA, distanceB);
+        } else {
+            return Double.compare(distanceB, distanceA);
+        }
     }
 }
 
