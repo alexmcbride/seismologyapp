@@ -21,14 +21,6 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
         return mEarthquakeListFragment;
     }
 
-    @Override
-    protected Fragment getDetailsFragment() {
-        if (mEarthquakeDetailFragment == null) {
-            mEarthquakeDetailFragment = EarthquakeDetailFragment.newInstance();
-        }
-        return mEarthquakeDetailFragment;
-    }
-
     public static ListMasterDetailFragment newInstance() {
         return new ListMasterDetailFragment();
     }
@@ -51,11 +43,9 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
 
     @Override
     public void onEarthquakeSelected(long id) {
-        // If we have a details container, tell the fragment to update itself?
-        // Or, do we load in a fresh fragment at this point?
         if (hasDetailsContainer()) {
             Fragment fragment = EarthquakeDetailFragment.newInstance(id);
-            replaceDetailsFragment(fragment);
+            updateDetailsContainer(fragment);
         } else {
             // Tell main activity to start a new details activity.
             mListener.onEarthquakeSelected(id);

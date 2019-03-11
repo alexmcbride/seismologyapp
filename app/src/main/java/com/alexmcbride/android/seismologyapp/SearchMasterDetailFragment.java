@@ -27,14 +27,6 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
         return mSearchEarthquakesFragment;
     }
 
-    @Override
-    protected Fragment getDetailsFragment() {
-        if (mSearchResultsFragment == null) {
-            mSearchResultsFragment = SearchResultsFragment.newInstance();
-        }
-        return mSearchResultsFragment;
-    }
-
     public static SearchMasterDetailFragment newInstance() {
         return new SearchMasterDetailFragment();
     }
@@ -58,7 +50,8 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
         if (hasDetailsContainer()) {
-            mSearchResultsFragment.updateSearchResults(start, end);
+            Fragment fragment = SearchResultsFragment.newInstance(start, end);
+            updateDetailsContainer(fragment);
         } else {
             mListener.onSearchEarthquakes(start, end);
         }

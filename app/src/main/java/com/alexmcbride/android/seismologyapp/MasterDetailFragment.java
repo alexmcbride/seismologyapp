@@ -20,8 +20,6 @@ public abstract class MasterDetailFragment extends Fragment {
 
     protected abstract Fragment getMasterFragment();
 
-    protected abstract Fragment getDetailsFragment();
-
     boolean hasDetailsContainer() {
         return mHasDetailsContainer;
     }
@@ -52,7 +50,7 @@ public abstract class MasterDetailFragment extends Fragment {
         return view;
     }
 
-    protected void replaceDetailsFragment(Fragment fragment) {
+    protected void updateDetailsContainer(Fragment fragment) {
         if (mHasDetailsContainer) {
             getChildFragmentManager().beginTransaction().replace(R.id.containerDetail, fragment).commitNow();
         }
@@ -65,10 +63,5 @@ public abstract class MasterDetailFragment extends Fragment {
         // Tell child fragments to save their state to this bundle.
         Bundle masterState = ((ChildFragment) getMasterFragment()).getSavedState();
         outState.putAll(masterState);
-
-        if (mHasDetailsContainer) {
-            Bundle detailState = ((ChildFragment) getDetailsFragment()).getSavedState();
-            outState.putAll(detailState);
-        }
     }
 }
