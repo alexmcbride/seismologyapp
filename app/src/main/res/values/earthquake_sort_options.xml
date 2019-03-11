@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="earthquake_sort_options">
-        <item>Nearest</item>
         <item>Date</item>
+        <item>Nearest</item>
         <item>Title</item>
         <item>Depth</item>
         <item>Magnitude</item>

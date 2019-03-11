@@ -1,7 +1,6 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -9,17 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.alexmcbride.android.seismologyapp.models.CloseableCursor;
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
-import com.alexmcbride.android.seismologyapp.models.EarthquakeCursorWrapper;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
+import com.google.common.collect.Lists;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 /*
  * Fragment used to select a list of earthquakes.
@@ -29,8 +30,8 @@ public class EarthquakeListFragment extends ChildFragment {
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private ListView mListEarthquakes;
-    private CloseableCursor mEarthquakeCursor;
-
+    private Spinner mSpinnerSortOptions;
+    private ArrayAdapter<CharSequence> mSpinnerSortOptionsAdapter;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -52,14 +53,15 @@ public class EarthquakeListFragment extends ChildFragment {
             }
         });
 
-        Spinner spinnerSortOptions = view.findViewById(R.id.spinnerSortOptions);
-        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSortOptions.setAdapter(adapter);
-        spinnerSortOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSpinnerSortOptions = view.findViewById(R.id.spinnerSortOptions);
+        mSpinnerSortOptionsAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
+        mSpinnerSortOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerSortOptions.setAdapter(mSpinnerSortOptionsAdapter);
+        mSpinnerSortOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-
+                String sortOption = mSpinnerSortOptionsAdapter.getItem(position).toString();
+                earthquakesUpdated(sortOption);
             }
 
             @Override
@@ -72,12 +74,6 @@ public class EarthquakeListFragment extends ChildFragment {
         earthquakesUpdated();
 
         return view;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        closeDatabase();
     }
 
     void setListener(OnFragmentInteractionListener listener) {
@@ -95,48 +91,63 @@ public class EarthquakeListFragment extends ChildFragment {
 
     }
 
-    void earthquakesUpdated() {
-        closeDatabase();
+    private String getSelectedSortOption() {
+        int position = mSpinnerSortOptions.getSelectedItemPosition();
+        return Objects.requireNonNull(mSpinnerSortOptionsAdapter.getItem(position)).toString();
+    }
 
-        // We do it this way so we can close the resources later.
-        mEarthquakeCursor = mEarthquakeRepository.getEarthquakesCursor();
-        EarthquakeCursorAdapter adapter = new EarthquakeCursorAdapter(getActivity(), mEarthquakeCursor.getCursor());
+    void earthquakesUpdated() {
+        String sortOption = getSelectedSortOption();
+        earthquakesUpdated(sortOption);
+    }
+
+    private void earthquakesUpdated(String sortOption) {
+        List<Earthquake> earthquakes = sortEarthquakeList(sortOption);
+        EarthquakesAdapter adapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
         mListEarthquakes.setAdapter(adapter);
     }
 
-    private void closeDatabase() {
-        if (mEarthquakeCursor != null) {
-            mEarthquakeCursor.close();
+    private List<Earthquake> sortEarthquakeList(String sortOption) {
+        if (sortOption.equalsIgnoreCase("nearest")) {
+            return mEarthquakeRepository.getEarthquakesByNearest(55.746310, -4.182994);
+        } else if (sortOption.equalsIgnoreCase("date")) {
+            return mEarthquakeRepository.getEarthquakesByDate();
+        } else if (sortOption.equalsIgnoreCase("title")) {
+            return mEarthquakeRepository.getEarthquakesByTitle();
+        } else if (sortOption.equalsIgnoreCase("depth")) {
+            return mEarthquakeRepository.getEarthquakesByDepth();
+        }else if (sortOption.equalsIgnoreCase("magnitude")) {
+            return mEarthquakeRepository.getEarthquakesByMagnitude();
+        }else {
+            return Lists.newArrayList();
         }
     }
 
-    private class EarthquakeCursorAdapter extends CursorAdapter {
-        private EarthquakeCursorWrapper mCursorWrapper;
-
-        EarthquakeCursorAdapter(Context context, Cursor cursor) {
-            super(context, cursor, 0);
-            mCursorWrapper = new EarthquakeCursorWrapper(cursor);
+    private class EarthquakesAdapter extends ArrayAdapter<Earthquake> {
+        EarthquakesAdapter(@NonNull Context context, List<Earthquake> earthquakes) {
+            super(context, -1);
+            addAll(earthquakes);
         }
 
+        @NonNull
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            View view = getLayoutInflater().inflate(R.layout.list_item_earthquake, viewGroup, false);
-            bindView(view, context, cursor);
-            return view;
-        }
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(R.layout.list_item_earthquake, parent, false);
+            }
 
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            Earthquake earthquake = mCursorWrapper.getEarthquake();
+            Earthquake earthquake = Objects.requireNonNull(getItem(position));
 
-            ((TextView) view.findViewById(R.id.textLocation)).setText(earthquake.getLocation());
-            ((TextView) view.findViewById(R.id.textDate)).setText(Util.formatPretty(earthquake.getPubDate()));
+            ((TextView) convertView.findViewById(R.id.textLocation)).setText(earthquake.getLocation());
+            ((TextView) convertView.findViewById(R.id.textDate)).setText(Util.formatPretty(earthquake.getPubDate()));
 
-            String depth = "Depth: " +  String.format(Locale.ENGLISH, "%.0f", earthquake.getDepth()) + " km";
-            ((TextView) view.findViewById(R.id.textDepth)).setText(depth);
+            String depth = "Depth: " + String.format(Locale.ENGLISH, "%.0f", earthquake.getDepth()) + " km";
+            ((TextView) convertView.findViewById(R.id.textDepth)).setText(depth);
 
-            String magnitude = "Magnitude: " +  String.format(Locale.ENGLISH, "%.2f", earthquake.getMagnitude());
-            ((TextView) view.findViewById(R.id.textMagnitude)).setText(magnitude);
+            String magnitude = "Magnitude: " + String.format(Locale.ENGLISH, "%.2f", earthquake.getMagnitude());
+            ((TextView) convertView.findViewById(R.id.textMagnitude)).setText(magnitude);
+
+            return convertView;
         }
     }
 
