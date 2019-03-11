@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements
         EarthquakeMapFragment.OnFragmentInteractionListener {
     private static final String TAG = "MainActivity";
     private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
+    private static final String ARG_FIRST_RUN = "ARG_FIRST_RUN";
     private static final String UPDATE_URL = "http://quakes.bgs.ac.uk/feeds/MhSeismology.xml";
     private static final int UPDATE_DELAY_MILLIS = 1000 * 60;//1 min
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
     private Handler mUpdateHandler = new Handler();
     private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable;
     private Snackbar mUpdateSnackbar;
+    private boolean mFirstRun;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements
         // Load activity preferences
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
+        mFirstRun = preferences.getBoolean(ARG_FIRST_RUN, true);
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
@@ -97,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(ARG_SELECTED_PAGE, mViewPager.getCurrentItem());
+        editor.putBoolean(ARG_FIRST_RUN, false);
         editor.apply();
     }
 
@@ -128,15 +132,23 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showUpdateSnackbar(int addedCount, View.OnClickListener listener) {
-        // Dismiss if already showing a snackbar.
-        if (mUpdateSnackbar != null && mUpdateSnackbar.isShown()) {
-            mUpdateSnackbar.dismiss();
+        if (mFirstRun) {
+            listener.onClick(null);
+        } else {
+            // Dismiss if already showing a snackbar.
+            if (mUpdateSnackbar != null && mUpdateSnackbar.isShown()) {
+                mUpdateSnackbar.dismiss();
+            }
+            View container = findViewById(R.id.container);
+            String message = getString(R.string.earthquakes_updated_snackbar_message, addedCount);
+            mUpdateSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
+            mUpdateSnackbar.setAction("Update?", listener);
+            mUpdateSnackbar.show();
         }
-        View container = findViewById(R.id.container);
-        String message = getString(R.string.earthquakes_updated_snackbar_message, addedCount);
-        mUpdateSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
-        mUpdateSnackbar.setAction("Update?", listener);
-        mUpdateSnackbar.show();
+    }
+
+    private void updateFragments() {
+        mListMasterDetailFragment.earthquakesUpdated();
     }
 
     private void earthquakesUpdated(final List<Earthquake> earthquakes) {
@@ -146,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
             showUpdateSnackbar(earthquakes.size(), new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mListMasterDetailFragment.earthquakesUpdated();
+                    updateFragments();
                 }
             });
         } else {
