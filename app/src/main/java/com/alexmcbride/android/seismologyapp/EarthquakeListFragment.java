@@ -1,9 +1,7 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -52,7 +50,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
         });
 
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
-        updateEarthquakes();
+        earthquakesUpdated();
 
         return view;
     }
@@ -78,7 +76,7 @@ public class EarthquakeListFragment extends Fragment implements ChildFragment {
 
     }
 
-    void updateEarthquakes() {
+    void earthquakesUpdated() {
         closeDatabase();
 
         // We do it this way so we can close the resources later.

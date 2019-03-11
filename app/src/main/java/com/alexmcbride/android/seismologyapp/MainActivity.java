@@ -3,8 +3,8 @@ package com.alexmcbride.android.seismologyapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -30,11 +30,19 @@ public class MainActivity extends AppCompatActivity implements
         SearchMasterDetailFragment.OnFragmentInteractionListener,
         ListMasterDetailFragment.OnFragmentInteractionListener,
         EarthquakeMapFragment.OnFragmentInteractionListener {
-    private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
     private static final String TAG = "MainActivity";
+    private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
+    private static final String UPDATE_URL = "http://quakes.bgs.ac.uk/feeds/MhSeismology.xml";
+    private static final int UPDATE_DELAY_MILLIS = 1000 * 60;//1 min
+
     private ViewPager mViewPager;
-    private EarthquakeRepository mEarthquakeRepository;
+    private SearchMasterDetailFragment mSearchMasterDetailFragment;
     private ListMasterDetailFragment mListMasterDetailFragment;
+    private EarthquakeMapFragment mEarthquakeMapFragment;
+    private EarthquakeRepository mEarthquakeRepository;
+    private EarthquakeRssReader mEarthquakeRssReader;
+    private Handler mUpdateHandler = new Handler();
+    private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,33 +52,40 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Create out parent fragments.
+        mSearchMasterDetailFragment = SearchMasterDetailFragment.newInstance();
         mListMasterDetailFragment = ListMasterDetailFragment.newInstance();
+        mEarthquakeMapFragment = EarthquakeMapFragment.newInstance();
 
         // Add tabs to our adapter.
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        sectionsPagerAdapter.addPage(SearchMasterDetailFragment.newInstance(), "Search");
+        sectionsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
         sectionsPagerAdapter.addPage(mListMasterDetailFragment, "List");
-        sectionsPagerAdapter.addPage(EarthquakeMapFragment.newInstance(), "Map");
+        sectionsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(sectionsPagerAdapter);
-
         TabLayout tabLayout = findViewById(R.id.tabs);
-
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
         tabLayout.setupWithViewPager(mViewPager);
 
-        // Load preferences
+        // Load activity preferences
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
 
+        // Download and DB stuff
+        mEarthquakeRssReader = new EarthquakeRssReader();
         mEarthquakeRepository = new EarthquakeRepository(this);
 
-        final String url = "http://quakes.bgs.ac.uk/feeds/MhSeismology.xml";
-//        new DownloadEarthquakesAsyncTask().execute(url);
+        startDownloadTask();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopDownloadTask();
     }
 
     @Override
@@ -111,11 +126,46 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    private void updateEarthquakes(List<Earthquake> earthquakes) {
-        Toast.makeText(this, "Earthquakes: " + earthquakes.size(), Toast.LENGTH_SHORT).show();
+    private void earthquakesUpdated(List<Earthquake> earthquakes) {
+        mListMasterDetailFragment.earthquakesUpdated();
     }
 
-    // Acts as a collection of tabs for the view pager.
+    private void startDownloadTask() {
+        mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, 0);
+    }
+
+    private void startDownloadTaskWithDelay() {
+        mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, UPDATE_DELAY_MILLIS);
+    }
+
+    private void stopDownloadTask() {
+        mUpdateHandler.removeCallbacks(mDownloadEarthquakesRunnable);
+    }
+
+    // Class to handle downloading updates on a timer.
+    private class DownloadEarthquakesRunnable implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Log.d(TAG, "Downloading earthquakes...");
+                // Download earthquakes and add to repository.
+                List<Earthquake> earthquakes = mEarthquakeRssReader.parse(UPDATE_URL);
+                boolean earthquakesAdded = mEarthquakeRepository.addEarthquakes(earthquakes);
+                if (earthquakesAdded) {
+                    Log.d(TAG, "Earthquakes updated");
+                    earthquakesUpdated(earthquakes);
+                } else {
+                    Log.d(TAG, "No new earthquakes found");
+                }
+                startDownloadTaskWithDelay();
+            } catch (Exception e) {
+                Log.d(TAG, "Task error: " + e.toString());
+                Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // Manages out collection of tab pages.
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
         private List<Page> mPageList = Lists.newArrayList();
 
@@ -151,33 +201,6 @@ public class MainActivity extends AppCompatActivity implements
             Page(Fragment fragment, String title) {
                 this.fragment = fragment;
                 this.title = title;
-            }
-        }
-    }
-
-    private class DownloadEarthquakesAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
-        private Exception mException;
-
-        @Override
-        protected List<Earthquake> doInBackground(String... strings) {
-            String url = strings[0];
-            EarthquakeRssReader earthquakeRssReader = new EarthquakeRssReader();
-            try {
-                return earthquakeRssReader.parse(url);
-            } catch (Exception e) {
-                mException = e;
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes) {
-            if (mException == null) {
-                mEarthquakeRepository.addEarthquakes(earthquakes);
-                mListMasterDetailFragment.updateEarthquakes();
-            } else {
-                Log.d(TAG, mException.toString());
-                Toast.makeText(MainActivity.this, "Error: " + mException.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

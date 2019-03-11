@@ -3,13 +3,11 @@ package com.alexmcbride.android.seismologyapp.models;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 public class EarthquakeRepository implements AutoCloseable {
@@ -20,10 +18,14 @@ public class EarthquakeRepository implements AutoCloseable {
         mDbHelper = new EarthquakeDbHelper(context);
     }
 
-    public void addEarthquakes(List<Earthquake> earthquakes) {
+    public boolean addEarthquakes(List<Earthquake> earthquakes) {
+        boolean changed = false;
         for (Earthquake earthquake : earthquakes) {
-            addEarthquake(earthquake);
+            if (addEarthquake(earthquake)) {
+                changed = true;
+            }
         }
+        return changed;
     }
 
     public boolean addEarthquake(Earthquake earthquake) {

@@ -58,8 +58,8 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
         }
     }
 
-    void updateEarthquakes() {
-        mEarthquakeListFragment.updateEarthquakes();
+    void earthquakesUpdated() {
+        mEarthquakeListFragment.earthquakesUpdated();
     }
 
     public interface OnFragmentInteractionListener {
