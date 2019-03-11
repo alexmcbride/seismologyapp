@@ -3,6 +3,9 @@ package com.alexmcbride.android.seismologyapp.models;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+/*
+ * Little wrapper class to make closing a cursor simpler.
+ */
 public class CloseableCursor implements AutoCloseable {
     private SQLiteDatabase mDatabase;
     private Cursor mCursor;

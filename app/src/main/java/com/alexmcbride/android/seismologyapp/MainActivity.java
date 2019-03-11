@@ -142,7 +142,11 @@ public class MainActivity extends AppCompatActivity implements
         mUpdateHandler.removeCallbacks(mDownloadEarthquakesRunnable);
     }
 
-    // Class to handle downloading updates on a timer.
+    /*
+     * Class to handle downloading updates on a timer. We only do this in main activity, as the
+     * other activities are only used for showing detail on a specific earthquake, so don't need
+     * to update as frequently.
+     */
     private class DownloadEarthquakesRunnable implements Runnable {
         @Override
         public void run() {
@@ -150,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "Downloading earthquakes...");
                 // Download earthquakes and add to repository.
                 List<Earthquake> earthquakes = mEarthquakeRssReader.parse(UPDATE_URL);
-                boolean earthquakesAdded = mEarthquakeRepository.addEarthquakes(earthquakes);
-                if (earthquakesAdded) {
+                boolean updated = mEarthquakeRepository.addEarthquakes(earthquakes);
+                if (updated) {
                     Log.d(TAG, "Earthquakes updated");
                     earthquakesUpdated(earthquakes);
                 } else {

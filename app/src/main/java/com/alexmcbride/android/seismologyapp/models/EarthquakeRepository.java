@@ -19,18 +19,20 @@ public class EarthquakeRepository implements AutoCloseable {
     }
 
     public boolean addEarthquakes(List<Earthquake> earthquakes) {
-        boolean changed = false;
+        boolean updated = false;
         for (Earthquake earthquake : earthquakes) {
             if (addEarthquake(earthquake)) {
-                changed = true;
+                updated = true;
             }
         }
-        return changed;
+        return updated;
     }
 
     public boolean addEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
             ContentValues contentValues = getContentValues(earthquake);
+            // we have a unique constraint setup on links, so if a row doesn't get inserted it
+            // returns -1.
             long id = db.insertWithOnConflict(EARTHQUAKES_TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
             if (id > -1) {
                 earthquake.setId(id);
