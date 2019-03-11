@@ -18,14 +18,14 @@ public class EarthquakeRepository implements AutoCloseable {
         mDbHelper = new EarthquakeDbHelper(context);
     }
 
-    public boolean addEarthquakes(List<Earthquake> earthquakes) {
-        boolean updated = false;
+    public List<Earthquake> addEarthquakes(List<Earthquake> earthquakes) {
+        List<Earthquake> added = Lists.newArrayList();
         for (Earthquake earthquake : earthquakes) {
             if (addEarthquake(earthquake)) {
-                updated = true;
+                added.add(earthquake);
             }
         }
-        return updated;
+        return added;
     }
 
     public boolean addEarthquake(Earthquake earthquake) {

@@ -3,9 +3,11 @@ package com.alexmcbride.android.seismologyapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
@@ -23,6 +26,7 @@ import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRssReader;
 import com.google.common.collect.Lists;
 
+import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
 
@@ -39,10 +43,9 @@ public class MainActivity extends AppCompatActivity implements
     private SearchMasterDetailFragment mSearchMasterDetailFragment;
     private ListMasterDetailFragment mListMasterDetailFragment;
     private EarthquakeMapFragment mEarthquakeMapFragment;
-    private EarthquakeRepository mEarthquakeRepository;
-    private EarthquakeRssReader mEarthquakeRssReader;
     private Handler mUpdateHandler = new Handler();
-    private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable();
+    private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable;
+    private Snackbar mUpdateSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +78,8 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
 
-        // Download and DB stuff
-        mEarthquakeRssReader = new EarthquakeRssReader();
-        mEarthquakeRepository = new EarthquakeRepository(this);
-
+        // Init timer stuff.
+        mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
         startDownloadTask();
     }
 
@@ -126,45 +127,92 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    private void earthquakesUpdated(List<Earthquake> earthquakes) {
-        mListMasterDetailFragment.earthquakesUpdated();
+    private void showUpdateSnackbar(int addedCount, View.OnClickListener listener) {
+        // Dismiss if already showing a snackbar.
+        if (mUpdateSnackbar != null && mUpdateSnackbar.isShown()) {
+            mUpdateSnackbar.dismiss();
+        }
+        View container = findViewById(R.id.container);
+        String message = getString(R.string.earthquakes_updated_snackbar_message, addedCount);
+        mUpdateSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
+        mUpdateSnackbar.setAction("Update?", listener);
+        mUpdateSnackbar.show();
+    }
+
+    private void earthquakesUpdated(final List<Earthquake> earthquakes) {
+        // Add to database.
+        if (earthquakes.size() > 0) {
+            Log.d(TAG, "Received earthquakes: " + earthquakes.size());
+            showUpdateSnackbar(earthquakes.size(), new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListMasterDetailFragment.earthquakesUpdated();
+                }
+            });
+        } else {
+            Log.d(TAG, "No new earthquakes found.");
+        }
     }
 
     private void startDownloadTask() {
         mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, 0);
     }
 
-    private void startDownloadTaskWithDelay() {
-        mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, UPDATE_DELAY_MILLIS);
-    }
-
     private void stopDownloadTask() {
         mUpdateHandler.removeCallbacks(mDownloadEarthquakesRunnable);
     }
 
-    /*
-     * Class to handle downloading updates on a timer. We only do this in main activity, as the
-     * other activities are only used for showing detail on a specific earthquake, so don't need
-     * to update as frequently.
-     */
     private class DownloadEarthquakesRunnable implements Runnable {
+        private final MainActivity mMainActivity;
+
+        DownloadEarthquakesRunnable(MainActivity mainActivity) {
+            mMainActivity = mainActivity;
+        }
+
         @Override
         public void run() {
+            new DownloadEarthquakesAsyncTask(mMainActivity).execute(UPDATE_URL);
+
+            // Trigger next tick of timer.
+            mUpdateHandler.postDelayed(mDownloadEarthquakesRunnable, UPDATE_DELAY_MILLIS);
+        }
+    }
+
+    private static class DownloadEarthquakesAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
+        private WeakReference<MainActivity> mActivityReference;
+        private Exception mException;
+
+        DownloadEarthquakesAsyncTask(MainActivity activityReference) {
+            mActivityReference = new WeakReference<>(activityReference);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.d(TAG, "Starting download earthquakes task...");
+        }
+
+        @Override
+        protected List<Earthquake> doInBackground(String... strings) {
+            String url = strings[0];
+            EarthquakeRssReader earthquakeRssReader = new EarthquakeRssReader();
             try {
-                Log.d(TAG, "Downloading earthquakes...");
-                // Download earthquakes and add to repository.
-                List<Earthquake> earthquakes = mEarthquakeRssReader.parse(UPDATE_URL);
-                boolean updated = mEarthquakeRepository.addEarthquakes(earthquakes);
-                if (updated) {
-                    Log.d(TAG, "Earthquakes updated");
-                    earthquakesUpdated(earthquakes);
-                } else {
-                    Log.d(TAG, "No new earthquakes found");
-                }
-                startDownloadTaskWithDelay();
+                List<Earthquake> earthquakes = earthquakeRssReader.parse(url);
+                EarthquakeRepository repository = new EarthquakeRepository(mActivityReference.get());
+                return repository.addEarthquakes(earthquakes);
             } catch (Exception e) {
-                Log.d(TAG, "Task error: " + e.toString());
-                Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                mException = e;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Earthquake> earthquakes) {
+            if (mException == null) {
+                MainActivity mainActivity = mActivityReference.get();
+                mainActivity.earthquakesUpdated(earthquakes);
+            } else {
+                Log.d(TAG, mException.toString());
+                Toast.makeText(mActivityReference.get(), "Error: " + mException.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
