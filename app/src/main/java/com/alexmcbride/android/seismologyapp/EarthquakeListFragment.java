@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -34,7 +35,7 @@ import javax.annotation.Nullable;
  * database queries, but sorting by the nearest earthquake to you requires your current location,
  * which means a bunch of services and permissions.
  */
-public class EarthquakeListFragment extends ChildFragment {
+public class EarthquakeListFragment extends ChildFragment implements AdapterView.OnItemSelectedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final String ARG_SELECTED_SORT_OPTION = "ARG_SELECTED_SORT_OPTION";
     private static final String ARG_SELECTED_SORT_DIRECTION = "ARG_SELECTED_SORT_DIRECTION";
@@ -79,11 +80,11 @@ public class EarthquakeListFragment extends ChildFragment {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             }
         } else {
-            // Try first get GPS, fallback to network.
             // todo: rewrite to use more modern fused location provider
             // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
+            // Try first get GPS, fallback to network.
             mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (mLastLocation==null){
+            if (mLastLocation == null) {
                 mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
         }
@@ -110,7 +111,7 @@ public class EarthquakeListFragment extends ChildFragment {
 
         // Init list.
         mListEarthquakes = view.findViewById(R.id.listEarthquakes);
-        mListEarthquakes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListEarthquakes.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Earthquake earthquake = Objects.requireNonNull(mEarthquakesAdapter.getItem(position));
@@ -123,32 +124,14 @@ public class EarthquakeListFragment extends ChildFragment {
         mSpinnerOptionsAdapter = ArrayAdapter.createFromResource(activity, R.array.earthquake_sort_options, android.R.layout.simple_spinner_item);
         mSpinnerOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerOptions.setAdapter(mSpinnerOptionsAdapter);
-        mSpinnerOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                earthquakesUpdated();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
+        mSpinnerOptions.setOnItemSelectedListener(this);
 
         // Init sort direction spinner
         mSpinnerDirection = view.findViewById(R.id.spinnerSortDirection);
         mSpinnerDirectionAdapter = ArrayAdapter.createFromResource(activity, R.array.earthquake_sort_direction, android.R.layout.simple_spinner_item);
         mSpinnerDirectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerDirection.setAdapter(mSpinnerDirectionAdapter);
-        mSpinnerDirection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                earthquakesUpdated();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
+        mSpinnerDirection.setOnItemSelectedListener(this);
 
         // Get spinner setting out of preferences.
         SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
@@ -160,6 +143,16 @@ public class EarthquakeListFragment extends ChildFragment {
         earthquakesUpdated();
 
         return view;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        updateLastLocation();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // Not used.
     }
 
     @Override
