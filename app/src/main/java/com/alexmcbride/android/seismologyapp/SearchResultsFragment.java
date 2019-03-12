@@ -3,12 +3,19 @@ package com.alexmcbride.android.seismologyapp;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.alexmcbride.android.seismologyapp.models.Earthquake;
+import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
+import com.alexmcbride.android.seismologyapp.models.SearchResult;
+
 import java.util.Date;
+import java.util.List;
 
 /*
  * Fragment used to show the results of a search.
@@ -33,7 +40,7 @@ public class SearchResultsFragment extends ChildFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mStartDate = new Date(getArguments().getLong(ARG_START_TIME));
-            mEndDate = new Date(getArguments().getLong(ARG_START_TIME));
+            mEndDate = new Date(getArguments().getLong(ARG_END_TIME));
         }
     }
 
@@ -41,10 +48,17 @@ public class SearchResultsFragment extends ChildFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
-        TextView textView = view.findViewById(R.id.textView);
-        if (mStartDate != null && mEndDate != null) {
-            textView.setText("Start: " + mStartDate.toString() + " End: " + mEndDate.toString());
-        }
+
+        RecyclerView listResults = view.findViewById(R.id.listResults);
+        listResults.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        listResults.setLayoutManager(layoutManager);
+
+        EarthquakeRepository earthquakeRepository = new EarthquakeRepository(getActivity());
+        List<SearchResult> searchResults = earthquakeRepository.search(mStartDate, mEndDate);
+        ResultsAdapter resultsAdapter = new ResultsAdapter(searchResults);
+        listResults.setAdapter(resultsAdapter);
+
         return view;
     }
 
@@ -61,5 +75,59 @@ public class SearchResultsFragment extends ChildFragment {
     @Override
     public Bundle getSavedState() {
         return new Bundle();
+    }
+
+    private class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private final List<SearchResult> mSearchResults;
+
+        ResultsAdapter(List<SearchResult> searchResults) {
+            mSearchResults = searchResults;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+            View view = getLayoutInflater().inflate(R.layout.list_item_search_result, viewGroup, false);
+            return new ResultViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+            SearchResult searchResult = mSearchResults.get(position);
+            Earthquake earthquake = searchResult.getEarthquake();
+            View view = viewHolder.itemView;
+
+            TextView textTitle = view.findViewById(R.id.textTitle);
+            textTitle.setText(searchResult.getTitle());
+
+            TextView textLocation = view.findViewById(R.id.textLocation);
+            textLocation.setText(earthquake.getLocation());
+
+            TextView textPubDate = view.findViewById(R.id.textPubDate);
+            textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
+
+            TextView textLat = view.findViewById(R.id.textLat);
+            textLat.setText(getString(R.string.earthquake_list_item_latitude, earthquake.getLat()));
+
+            TextView textLon = view.findViewById(R.id.textLon);
+            textLon.setText(getString(R.string.earthquake_list_item_longitude, earthquake.getLon()));
+
+            TextView textDepth = view.findViewById(R.id.textDepth);
+            textDepth.setText(getString(R.string.earthquake_list_item_depth, earthquake.getDepth()));
+
+            TextView textMagnitude = view.findViewById(R.id.textMagnitude);
+            textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude()));
+        }
+
+        @Override
+        public int getItemCount() {
+            return mSearchResults.size();
+        }
+    }
+
+    public static class ResultViewHolder extends RecyclerView.ViewHolder {
+        ResultViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 }

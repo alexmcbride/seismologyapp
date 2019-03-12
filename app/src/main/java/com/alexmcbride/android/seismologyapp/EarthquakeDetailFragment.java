@@ -41,7 +41,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_earthquake_detail, container, false);
 
-        TextView textLocation = view.findViewById(R.id.textLocation);
+        TextView textLocation = view.findViewById(R.id.textTitle);
         textLocation.setText(mEarthquake.getLocation());
 
         TextView textPubDate = view.findViewById(R.id.textPubDate);

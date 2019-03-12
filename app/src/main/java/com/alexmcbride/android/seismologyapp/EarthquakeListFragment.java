@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -249,8 +248,8 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
 
             Earthquake earthquake = Objects.requireNonNull(getItem(position));
 
-            ((TextView) convertView.findViewById(R.id.textLocation)).setText(earthquake.getLocation());
-            ((TextView) convertView.findViewById(R.id.textDate)).setText(Util.formatPretty(earthquake.getPubDate()));
+            ((TextView) convertView.findViewById(R.id.textTitle)).setText(earthquake.getLocation());
+            ((TextView) convertView.findViewById(R.id.textPubDate)).setText(Util.formatPretty(earthquake.getPubDate()));
 
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             ((TextView) convertView.findViewById(R.id.textDepth)).setText(depth);

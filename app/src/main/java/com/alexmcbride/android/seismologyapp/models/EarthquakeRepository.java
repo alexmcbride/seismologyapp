@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.google.common.collect.Lists;
 
-import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -116,6 +116,63 @@ public class EarthquakeRepository implements AutoCloseable {
             if (cursor.moveToFirst()) {
                 EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
                 return cursorWrapper.getEarthquake();
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public List<SearchResult> search(Date start, Date end) {
+        List<SearchResult> results = Lists.newArrayList();
+        results.add(getNorthernmostEarthquake(start, end));
+        results.add(getEasternmostEarthquake(start, end));
+        results.add(getSouthernmostEarthquake(start, end));
+        results.add(getWesternmostEarthquake(start, end));
+        results.add(getLargestMagnitudeEarthquake(start, end));
+        results.add(getLowestDepthEarthquake(start, end));
+        return results;
+    }
+
+    private SearchResult getNorthernmostEarthquake(Date start, Date end) {
+        return getSearchResult("Northernmost", "lat DESC", start, end);
+    }
+
+    private SearchResult getSouthernmostEarthquake(Date start, Date end) {
+        return getSearchResult("Southernmost", "lat ASC", start, end);
+    }
+
+    private SearchResult getEasternmostEarthquake(Date start, Date end) {
+        return getSearchResult("Easternmost", "lon DESC", start, end);
+    }
+
+    private SearchResult getWesternmostEarthquake(Date start, Date end) {
+        return getSearchResult("Westernmost", "lon ASC", start, end);
+    }
+
+    private SearchResult getLargestMagnitudeEarthquake(Date start, Date end) {
+        return getSearchResult("Largest Magnitude", "magnitude DESC", start, end);
+    }
+
+    private SearchResult getLowestDepthEarthquake(Date start, Date end) {
+        return getSearchResult("Lowest Depth", "depth DESC", start, end);
+    }
+
+    private SearchResult getSearchResult(String title, String orderBy, Date start, Date end) {
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
+                     "pubDate BETWEEN ? AND ?",
+                     new String[]{String.valueOf(start.getTime()), String.valueOf(end.getTime())},
+                     null,
+                     null,
+                     orderBy,
+                     "1")) {
+            if (cursor.moveToFirst()) {
+                EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
+                Earthquake earthquake = cursorWrapper.getEarthquake();
+                SearchResult searchResult = new SearchResult();
+                searchResult.setTitle(title);
+                searchResult.setEarthquake(earthquake);
+                return searchResult;
             } else {
                 return null;
             }
