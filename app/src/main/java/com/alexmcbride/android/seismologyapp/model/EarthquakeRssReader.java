@@ -1,4 +1,4 @@
-package com.alexmcbride.android.seismologyapp.models;
+package com.alexmcbride.android.seismologyapp.model;
 
 import com.google.common.collect.Lists;
 

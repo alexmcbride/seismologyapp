@@ -21,9 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.alexmcbride.android.seismologyapp.models.Earthquake;
-import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
-import com.alexmcbride.android.seismologyapp.models.EarthquakeRssReader;
+import com.alexmcbride.android.seismologyapp.model.Earthquake;
+import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
+import com.alexmcbride.android.seismologyapp.model.EarthquakeRssReader;
 import com.google.common.collect.Lists;
 
 import java.lang.ref.WeakReference;

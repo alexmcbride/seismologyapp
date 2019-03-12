@@ -23,8 +23,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alexmcbride.android.seismologyapp.models.Earthquake;
-import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
+import com.alexmcbride.android.seismologyapp.model.Earthquake;
+import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
 
 import java.util.List;
 import java.util.Objects;

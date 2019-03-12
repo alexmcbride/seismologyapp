@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.alexmcbride.android.seismologyapp.models.Earthquake;
-import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
+import com.alexmcbride.android.seismologyapp.model.Earthquake;
+import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
