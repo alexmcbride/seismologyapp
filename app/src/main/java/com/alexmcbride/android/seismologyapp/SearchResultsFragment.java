@@ -3,7 +3,6 @@ package com.alexmcbride.android.seismologyapp;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +18,9 @@ public class SearchResultsFragment extends ChildFragment {
     private static final String ARG_END_TIME = "ARG_END_TIME";
     private Date mStartDate;
     private Date mEndDate;
-    private TextView textView;
-
-    public static SearchResultsFragment newInstance() {
-        return new SearchResultsFragment();
-    }
 
     public static SearchResultsFragment newInstance(Date start, Date end) {
-        SearchResultsFragment fragment = newInstance();
+        SearchResultsFragment fragment = new SearchResultsFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_START_TIME, start.getTime());
         args.putLong(ARG_END_TIME, end.getTime());
@@ -47,7 +41,7 @@ public class SearchResultsFragment extends ChildFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_results, container, false);
-        textView = view.findViewById(R.id.textView);
+        TextView textView = view.findViewById(R.id.textView);
         if (mStartDate != null && mEndDate != null) {
             textView.setText("Start: " + mStartDate.toString() + " End: " + mEndDate.toString());
         }
@@ -57,11 +51,6 @@ public class SearchResultsFragment extends ChildFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-    }
-
-    void updateSearchResults(Date start, Date end) {
-        // update ui
-        textView.setText("Updated");
     }
 
     @Override

@@ -66,6 +66,10 @@ public class EarthquakeRepository implements AutoCloseable {
         return ascending ? "ASC" : "DESC";
     }
 
+    public List<Earthquake> getEarthquakes() {
+        return getEarthquakesInternal(null);
+    }
+
     public List<Earthquake> getEarthquakesByDate(boolean ascending) {
         return getEarthquakesInternal("pubDate " + getAscOrDesc(ascending));
     }

@@ -1,6 +1,7 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -65,21 +67,12 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         // We need to know the user's location for the sort by nearest option.
         Activity activity = Objects.requireNonNull(getActivity());
         mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-
         updateLastLocation();
     }
 
+    @SuppressLint("MissingPermission")
     private void updateLastLocation() {
-        // As the earthquakes are quite spread out a high level of accuracy isn't needed. Also we
-        // don't bother to update the location again for the same reason.
-        Activity activity = Objects.requireNonNull(getActivity());
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Toast.makeText(activity, R.string.location_permission_explanation, Toast.LENGTH_SHORT).show();
-            } else {
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-            }
-        } else {
+        if (checkLocationPermission()) {
             // todo: rewrite to use more modern fused location provider
             // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
             // Try first get GPS, fallback to network.
@@ -87,6 +80,21 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
             if (mLastLocation == null) {
                 mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
+        }
+    }
+
+    private boolean checkLocationPermission() {
+        Activity activity = Objects.requireNonNull(getActivity());
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // todo: make this modal, so user can click yes and repeat permission stuff
+                Toast.makeText(activity, R.string.location_permission_explanation, Toast.LENGTH_SHORT).show();
+            } else {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+            return false;
         }
     }
 

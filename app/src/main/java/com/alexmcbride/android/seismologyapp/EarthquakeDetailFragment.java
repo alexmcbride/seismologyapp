@@ -28,12 +28,8 @@ public class EarthquakeDetailFragment extends ChildFragment {
     private Earthquake mEarthquake;
     private MapView mMapView;
 
-    public static EarthquakeDetailFragment newInstance() {
-        return new EarthquakeDetailFragment();
-    }
-
     public static EarthquakeDetailFragment newInstance(long id) {
-        EarthquakeDetailFragment fragment = newInstance();
+        EarthquakeDetailFragment fragment = new EarthquakeDetailFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_EARTHQUAKE_ID, id);
         fragment.setArguments(args);

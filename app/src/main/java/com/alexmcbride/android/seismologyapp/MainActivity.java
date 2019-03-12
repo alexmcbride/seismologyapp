@@ -32,8 +32,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         SearchMasterDetailFragment.OnFragmentInteractionListener,
-        ListMasterDetailFragment.OnFragmentInteractionListener,
-        EarthquakeMapFragment.OnFragmentInteractionListener {
+        ListMasterDetailFragment.OnFragmentInteractionListener {
     private static final String TAG = "MainActivity";
     private static final String ARG_SELECTED_PAGE = "ARG_SELECTED_PAGE";
     private static final String ARG_FIRST_RUN = "ARG_FIRST_RUN";
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
-        startDownloadTask();
+//        startDownloadTask();
     }
 
     @Override
