@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Search for earthquakes within the selected range"
+            android:text="@string/search_earthquakes_message"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Start date"
+            android:text="@string/search_earthquakes_start_date"
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Choose Date"
+            android:text="@string/search_earthquakes_choose_date"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -45,7 +45,7 @@
             android:layout_width="200dp"
             android:layout_height="20dp"
             android:layout_marginStart="8dp"
-            android:text="09/08/2019"
+            tools:text="09/08/2019"
             app:layout_constraintBaseline_toBaselineOf="@+id/buttonStartDate"
             app:layout_constraintStart_toEndOf="@+id/buttonStartDate" />
 
@@ -54,7 +54,7 @@
             android:layout_width="200dp"
             android:layout_height="18dp"
             android:layout_marginStart="8dp"
-            android:text="14:24"
+            tools:text="14:24"
             app:layout_constraintBaseline_toBaselineOf="@+id/buttonStartTime"
             app:layout_constraintStart_toEndOf="@+id/buttonStartTime" />
 
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Choose Time"
+            android:text="@string/search_earthquakes_choose_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonStartDate" />
 
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="End date"
+            android:text="@string/search_earthquakes_end_date"
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonStartTime" />
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Choose Date"
+            android:text="@string/search_earthquakes_choose_date"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
@@ -94,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="09/03/2019"
+            tools:text="09/03/2019"
             app:layout_constraintBaseline_toBaselineOf="@+id/buttonEndDate"
             app:layout_constraintStart_toEndOf="@+id/buttonEndDate" />
 
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Choose Time"
+            android:text="@string/search_earthquakes_choose_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonEndDate" />
 
@@ -113,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="14:28"
+            tools:text="14:28"
             app:layout_constraintBaseline_toBaselineOf="@+id/buttonEndTime"
             app:layout_constraintStart_toEndOf="@+id/buttonEndTime" />
 
@@ -124,7 +124,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="Search"
+            android:text="@string/search_earthquakes_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonEndTime" />

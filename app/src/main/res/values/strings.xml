@@ -8,7 +8,7 @@
     <string name="location_permission_denied">Location permission not granted :(</string>
     <string name="earthquake_list_item_depth" formatted="false">Depth: %.0f km</string>
     <string name="earthquake_list_item_magnitude">Magnitude: %.2f</string>
-    <string name="earthquake_list_item_pubdate">Timestamp: %s</string>
+    <string name="earthquake_list_item_pub_date">Timestamp: %s</string>
     <string name="earthquake_list_item_category">Category: %s</string>
     <string name="earthquake_list_item_latitude">Latitude: %.3f</string>
     <string name="earthquake_list_item_longitude">Longitude: %.3f</string>
@@ -17,4 +17,10 @@
     <string name="earthquake_detail_fragment_title">Earthquake Info</string>
     <string name="earthquake_map_marker_title">%s - %.0fkm - %.1f</string>
     <string name="update_snackbar_question">Update?</string>
+    <string name="search_earthquakes_message">Search for earthquakes within the selected range</string>
+    <string name="search_earthquakes_start_date">Start date</string>
+    <string name="search_earthquakes_choose_date">Choose Date</string>
+    <string name="search_earthquakes_choose_time">Choose Time</string>
+    <string name="search_earthquakes_end_date">End date</string>
+    <string name="search_earthquakes_button">Search</string>
 </resources>

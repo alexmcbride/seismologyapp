@@ -45,7 +45,7 @@ public class EarthquakeDetailFragment extends ChildFragment {
         textLocation.setText(mEarthquake.getLocation());
 
         TextView textPubDate = view.findViewById(R.id.textPubDate);
-        textPubDate.setText(getString(R.string.earthquake_list_item_pubdate, Util.formatPretty(mEarthquake.getPubDate())));
+        textPubDate.setText(getString(R.string.earthquake_list_item_pub_date, Util.formatPretty(mEarthquake.getPubDate())));
 
         TextView textMagnitude = view.findViewById(R.id.textMagnitude);
         textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, mEarthquake.getMagnitude()));
