@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements
 
         // Add fragments to adapter.
         FragmentsPagerAdapter fragmentsPagerAdapter = new FragmentsPagerAdapter(getSupportFragmentManager());
-        fragmentsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
         fragmentsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
+        fragmentsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
         fragmentsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
 
         // Set up the ViewPager with the fragment adapter.
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
-//        startDownloadTask();
+        startDownloadTask();
     }
 
     @Override
