@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.alexmcbride.android.seismologyapp.models.Earthquake;
 import com.alexmcbride.android.seismologyapp.models.EarthquakeRepository;
 import com.alexmcbride.android.seismologyapp.models.SearchResult;
+import com.google.common.collect.Lists;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ public class SearchResultsFragment extends ChildFragment {
     private static final String ARG_END_TIME = "ARG_END_TIME";
     private Date mStartDate;
     private Date mEndDate;
+    private EarthquakeRepository mEarthquakeRepository;
 
     public static SearchResultsFragment newInstance(Date start, Date end) {
         SearchResultsFragment fragment = new SearchResultsFragment();
@@ -54,12 +56,23 @@ public class SearchResultsFragment extends ChildFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         listResults.setLayoutManager(layoutManager);
 
-        EarthquakeRepository earthquakeRepository = new EarthquakeRepository(getActivity());
-        List<SearchResult> searchResults = earthquakeRepository.search(mStartDate, mEndDate);
+        mEarthquakeRepository = new EarthquakeRepository(getActivity());
+        List<SearchResult> searchResults = getSearchResults();
         ResultsAdapter resultsAdapter = new ResultsAdapter(searchResults);
         listResults.setAdapter(resultsAdapter);
 
         return view;
+    }
+
+    private List<SearchResult> getSearchResults() {
+        List<SearchResult> results = Lists.newArrayList();
+        results.add(mEarthquakeRepository.getNorthernmostEarthquake(mStartDate, mEndDate));
+        results.add(mEarthquakeRepository.getEasternmostEarthquake(mStartDate, mEndDate));
+        results.add(mEarthquakeRepository.getSouthernmostEarthquake(mStartDate, mEndDate));
+        results.add(mEarthquakeRepository.getWesternmostEarthquake(mStartDate, mEndDate));
+        results.add(mEarthquakeRepository.getLargestMagnitudeEarthquake(mStartDate, mEndDate));
+        results.add(mEarthquakeRepository.getLowestDepthEarthquake(mStartDate, mEndDate));
+        return results;
     }
 
     @Override

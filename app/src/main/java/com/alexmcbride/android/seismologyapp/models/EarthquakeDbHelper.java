@@ -30,7 +30,8 @@ class EarthquakeDbHelper extends SQLiteOpenHelper {
                 "magnitude REAL" +
                 ");");
 
-        // As each link links to a different event they should be unique
+        // As each link links to a different event they should be unique, we use this to make sure
+        // no duplicate earthquakes are added.
         db.execSQL("CREATE UNIQUE INDEX idx_links ON earthquakes (link);");
     }
 

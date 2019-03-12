@@ -53,15 +53,6 @@ public class EarthquakeRepository implements AutoCloseable {
         }
     }
 
-    public boolean updateEarthquake(Earthquake earthquake) {
-        try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {
-            ContentValues contentValues = EarthquakeCursorWrapper.getContentValues(earthquake);
-            long affected = db.update(EARTHQUAKES_TABLE, contentValues, "_id=?",
-                    new String[]{String.valueOf(earthquake.getId())});
-            return affected > 0;
-        }
-    }
-
     private static String getAscOrDesc(boolean ascending) {
         return ascending ? "ASC" : "DESC";
     }
@@ -122,38 +113,27 @@ public class EarthquakeRepository implements AutoCloseable {
         }
     }
 
-    public List<SearchResult> search(Date start, Date end) {
-        List<SearchResult> results = Lists.newArrayList();
-        results.add(getNorthernmostEarthquake(start, end));
-        results.add(getEasternmostEarthquake(start, end));
-        results.add(getSouthernmostEarthquake(start, end));
-        results.add(getWesternmostEarthquake(start, end));
-        results.add(getLargestMagnitudeEarthquake(start, end));
-        results.add(getLowestDepthEarthquake(start, end));
-        return results;
-    }
-
-    private SearchResult getNorthernmostEarthquake(Date start, Date end) {
+    public SearchResult getNorthernmostEarthquake(Date start, Date end) {
         return getSearchResult("Northernmost", "lat DESC", start, end);
     }
 
-    private SearchResult getSouthernmostEarthquake(Date start, Date end) {
+    public SearchResult getSouthernmostEarthquake(Date start, Date end) {
         return getSearchResult("Southernmost", "lat ASC", start, end);
     }
 
-    private SearchResult getEasternmostEarthquake(Date start, Date end) {
+    public SearchResult getEasternmostEarthquake(Date start, Date end) {
         return getSearchResult("Easternmost", "lon DESC", start, end);
     }
 
-    private SearchResult getWesternmostEarthquake(Date start, Date end) {
+    public SearchResult getWesternmostEarthquake(Date start, Date end) {
         return getSearchResult("Westernmost", "lon ASC", start, end);
     }
 
-    private SearchResult getLargestMagnitudeEarthquake(Date start, Date end) {
+    public SearchResult getLargestMagnitudeEarthquake(Date start, Date end) {
         return getSearchResult("Largest Magnitude", "magnitude DESC", start, end);
     }
 
-    private SearchResult getLowestDepthEarthquake(Date start, Date end) {
+    public SearchResult getLowestDepthEarthquake(Date start, Date end) {
         return getSearchResult("Lowest Depth", "depth DESC", start, end);
     }
 
