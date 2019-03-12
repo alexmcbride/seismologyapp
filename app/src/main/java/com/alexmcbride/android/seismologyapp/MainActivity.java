@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showUpdateSnackbar(int addedCount, View.OnClickListener listener) {
+        // When first running don't bother to ask the user to update.
         if (mFirstRun) {
             listener.onClick(null);
         } else {
@@ -138,10 +139,12 @@ public class MainActivity extends AppCompatActivity implements
             if (mUpdateSnackbar != null && mUpdateSnackbar.isShown()) {
                 mUpdateSnackbar.dismiss();
             }
+
+            // Ask user if they want to update the UI now.
             View container = findViewById(R.id.container);
             String message = getString(R.string.earthquakes_updated_snackbar_message, addedCount);
             mUpdateSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
-            mUpdateSnackbar.setAction("Update?", listener);
+            mUpdateSnackbar.setAction(R.string.update_snackbar_question, listener);
             mUpdateSnackbar.show();
         }
     }

@@ -16,4 +16,5 @@
     <string name="earthquake_list_sort">Sort by:</string>
     <string name="earthquake_detail_fragment_title">Earthquake Info</string>
     <string name="earthquake_map_marker_title">%s - %.0fkm - %.1f</string>
+    <string name="update_snackbar_question">Update?</string>
 </resources>

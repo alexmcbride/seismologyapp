@@ -1,7 +1,6 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 
 import java.util.Date;
 

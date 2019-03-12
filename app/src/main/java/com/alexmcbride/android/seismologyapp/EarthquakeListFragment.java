@@ -49,7 +49,6 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     private ArrayAdapter<CharSequence> mSpinnerDirectionAdapter;
     private LocationManager mLocationManager;
     private Location mLastLocation;
-    private EarthquakesAdapter mEarthquakesAdapter;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -207,8 +206,8 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
             // We need to reset the adapter to get it to change, as we're not reordering the list,
             // we're creating a new one each time from the database.
             // todo: look into just loading the list once and then sorting it.
-            mEarthquakesAdapter = new EarthquakesAdapter(earthquakes);
-            mRecyclerViewEarthquakes.setAdapter(mEarthquakesAdapter);
+            EarthquakesAdapter earthquakesAdapter = new EarthquakesAdapter(earthquakes);
+            mRecyclerViewEarthquakes.setAdapter(earthquakesAdapter);
         } else {
             Toast.makeText(getActivity(), R.string.no_earthquakes_message, Toast.LENGTH_SHORT).show();
         }
