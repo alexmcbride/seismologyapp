@@ -12,13 +12,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +42,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     private static final String ARG_SELECTED_SORT_DIRECTION = "ARG_SELECTED_SORT_DIRECTION";
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
-    private ListView mListEarthquakes;
+    private RecyclerView mRecyclerViewEarthquakes;
     private Spinner mSpinnerOptions;
     private Spinner mSpinnerDirection;
     private ArrayAdapter<CharSequence> mSpinnerOptionsAdapter;
@@ -116,15 +116,10 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         View view = inflater.inflate(R.layout.fragment_earthquake_list, container, false);
         Activity activity = Objects.requireNonNull(getActivity());
 
-        // Init list.
-        mListEarthquakes = view.findViewById(R.id.listEarthquakes);
-        mListEarthquakes.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Earthquake earthquake = Objects.requireNonNull(mEarthquakesAdapter.getItem(position));
-                mListener.onEarthquakeSelected(earthquake.getId());
-            }
-        });
+        // Init recycler view.
+        mRecyclerViewEarthquakes = view.findViewById(R.id.listEarthquakes);
+        mRecyclerViewEarthquakes.setHasFixedSize(true);
+        mRecyclerViewEarthquakes.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Init sort order spinner
         mSpinnerOptions = view.findViewById(R.id.spinnerSortOptions);
@@ -209,8 +204,11 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     private void earthquakesUpdated(String sortOption, boolean sortDirection) {
         List<Earthquake> earthquakes = getSortedEarthquakes(sortOption, sortDirection);
         if (earthquakes != null) {
-            mEarthquakesAdapter = new EarthquakesAdapter(Objects.requireNonNull(getActivity()), earthquakes);
-            mListEarthquakes.setAdapter(mEarthquakesAdapter);
+            // We need to reset the adapter to get it to change, as we're not reordering the list,
+            // we're creating a new one each time from the database.
+            // todo: look into just loading the list once and then sorting it.
+            mEarthquakesAdapter = new EarthquakesAdapter(earthquakes);
+            mRecyclerViewEarthquakes.setAdapter(mEarthquakesAdapter);
         } else {
             Toast.makeText(getActivity(), R.string.no_earthquakes_message, Toast.LENGTH_SHORT).show();
         }
@@ -233,31 +231,57 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         }
     }
 
-    private class EarthquakesAdapter extends ArrayAdapter<Earthquake> {
-        EarthquakesAdapter(@NonNull Context context, List<Earthquake> earthquakes) {
-            super(context, -1);
-            addAll(earthquakes);
+    private class EarthquakesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private final List<Earthquake> mEarthquakes;
+
+        EarthquakesAdapter(List<Earthquake> earthquakes) {
+            super();
+            mEarthquakes = earthquakes;
         }
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.list_item_earthquake, parent, false);
-            }
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+            View view = getLayoutInflater().inflate(R.layout.list_item_earthquake, viewGroup, false);
+            return new EarthquakeViewHolder(view);
+        }
 
-            Earthquake earthquake = Objects.requireNonNull(getItem(position));
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+            final Earthquake earthquake = Objects.requireNonNull(mEarthquakes.get(position));
+            View view = viewHolder.itemView;
 
-            ((TextView) convertView.findViewById(R.id.textTitle)).setText(earthquake.getLocation());
-            ((TextView) convertView.findViewById(R.id.textPubDate)).setText(Util.formatPretty(earthquake.getPubDate()));
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onEarthquakeSelected(earthquake.getId());
+                }
+            });
+
+            TextView textTitle = view.findViewById(R.id.textTitle);
+            textTitle.setText(earthquake.getLocation());
+
+            TextView textPubDate = view.findViewById(R.id.textPubDate);
+            textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
 
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
-            ((TextView) convertView.findViewById(R.id.textDepth)).setText(depth);
+            TextView textDepth = view.findViewById(R.id.textDepth);
+            textDepth.setText(depth);
 
             String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());
-            ((TextView) convertView.findViewById(R.id.textMagnitude)).setText(magnitude);
+            TextView textMagnitude = view.findViewById(R.id.textMagnitude);
+            textMagnitude.setText(magnitude);
+        }
 
-            return convertView;
+        @Override
+        public int getItemCount() {
+            return mEarthquakes.size();
+        }
+    }
+
+    public class EarthquakeViewHolder extends RecyclerView.ViewHolder {
+        EarthquakeViewHolder(@NonNull View itemView) {
+            super(itemView);
         }
     }
 
