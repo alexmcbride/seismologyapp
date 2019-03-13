@@ -161,6 +161,31 @@ public class EarthquakeRepository implements AutoCloseable {
         }
     }
 
+    public Date getLowestDate() {
+        return getDateInternal("pubDate ASC");
+    }
+
+    public Date getHighestDate() {
+        return getDateInternal("pubDate DESC");
+    }
+
+    private Date getDateInternal(String orderBy) {
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, new String[]{"pubDate"},
+                     null,
+                     null,
+                     null,
+                     null,
+                     orderBy,
+                     "1")) {
+            if (cursor.moveToFirst()) {
+                return Util.parseIso8601(cursor.getString(0));
+            } else {
+                return null;
+            }
+        }
+    }
+
     @Override
     public void close() {
         mDbHelper.close();

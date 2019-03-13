@@ -19,8 +19,7 @@
     <string name="update_snackbar_question">Update?</string>
     <string name="search_earthquakes_message">Search for earthquakes within the selected range</string>
     <string name="search_earthquakes_start_date">Start date</string>
-    <string name="search_earthquakes_choose_date">Choose Date</string>
-    <string name="search_earthquakes_choose_time">Choose Time</string>
-    <string name="search_earthquakes_end_date">End date</string>
+    <string name="search_earthquakes_choose_start_date">Choose Start Date</string>
+    <string name="search_earthquakes_choose_end_date">Choose End Date</string>
     <string name="search_earthquakes_button">Search</string>
 </resources>

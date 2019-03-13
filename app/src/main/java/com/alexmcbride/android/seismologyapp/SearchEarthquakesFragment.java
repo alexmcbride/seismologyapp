@@ -1,7 +1,6 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,7 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
+
+import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,8 +31,6 @@ public class SearchEarthquakesFragment extends ChildFragment {
 
     public SearchEarthquakesFragment() {
         // Required empty public constructor
-        int year = mStartDate.get(Calendar.YEAR);
-        mStartDate.set(Calendar.YEAR, year - 1);
     }
 
     public static SearchEarthquakesFragment newInstance() {
@@ -42,6 +40,14 @@ public class SearchEarthquakesFragment extends ChildFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EarthquakeRepository earthquakeRepository = new EarthquakeRepository(getActivity());
+        mStartDate.setTime(earthquakeRepository.getLowestDate());
+        mStartDate.set(Calendar.HOUR_OF_DAY, 0);
+        mStartDate.set(Calendar.MINUTE, 0);
+        mEndDate.setTime(earthquakeRepository.getHighestDate());
+        mEndDate.set(Calendar.HOUR_OF_DAY, 23);
+        mEndDate.set(Calendar.MINUTE, 59);
     }
 
     @Override
@@ -57,24 +63,14 @@ public class SearchEarthquakesFragment extends ChildFragment {
         final FragmentActivity context = Objects.requireNonNull(getActivity());
         final TextView textStartDate = view.findViewById(R.id.textStartDate);
         textStartDate.setText(Util.formatDate(mStartDate.getTime()));
-        final TextView textStartTime = view.findViewById(R.id.textStartTime);
-        textStartTime.setText(Util.formatTime(mStartDate.getTime()));
         final TextView textEndDate = view.findViewById(R.id.textEndDate);
         textEndDate.setText(Util.formatDate(mEndDate.getTime()));
-        final TextView textEndTime = view.findViewById(R.id.textEndTime);
-        textEndTime.setText(Util.formatTime(mEndDate.getTime()));
 
         Button chooseStartDate = view.findViewById(R.id.buttonStartDate);
         setDateListener(context, textStartDate, chooseStartDate, mStartDate);
 
-        Button chooseStartTime = view.findViewById(R.id.buttonStartTime);
-        setTimeListener(context, textStartTime, chooseStartTime, mStartDate);
-
         Button chooseEndDate = view.findViewById(R.id.buttonEndDate);
         setDateListener(context, textEndDate, chooseEndDate, mEndDate);
-
-        Button chooseEndTime = view.findViewById(R.id.buttonEndTime);
-        setTimeListener(context, textEndTime, chooseEndTime, mEndDate);
 
         Button buttonSearch = view.findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
@@ -102,22 +98,6 @@ public class SearchEarthquakesFragment extends ChildFragment {
                         textView.setText(Util.formatDate(calendar.getTime()));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-    }
-
-    private void setTimeListener(final FragmentActivity context, final TextView textView, final Button button, final Calendar calendar) {
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        calendar.set(Calendar.HOUR_OF_DAY, hour);
-                        calendar.set(Calendar.MINUTE, minute);
-                        textView.setText(Util.formatTime(calendar.getTime()));
-                    }
-                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
             }
         });
     }
