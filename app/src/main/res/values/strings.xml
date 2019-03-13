@@ -21,5 +21,10 @@
     <string name="search_earthquakes_start_date">Start date</string>
     <string name="search_earthquakes_choose_start_date">Choose Start Date</string>
     <string name="search_earthquakes_choose_end_date">Choose End Date</string>
-    <string name="search_earthquakes_button">Search</string>
+    <string name="search_dates_earthquakes_button">Search Date</string>
+    <string name="search_earthquakes_location_title">Search for earthquakes by location</string>
+    <string name="search_location_earthquake_results">Search Location</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -48,14 +48,25 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     @Override
     public void onSearchEarthquakes(Date start, Date end) {
         if (hasDetailsContainer()) {
-            SearchResultsFragment fragment = SearchResultsFragment.newInstance(start, end);
+            SearchDateResultsFragment fragment = SearchDateResultsFragment.newInstance(start, end);
             updateDetailsContainer(fragment);
         } else {
             mListener.onSearchEarthquakes(start, end);
         }
     }
 
+    @Override
+    public void onSearchEarthquakes(String location) {
+        if (hasDetailsContainer()) {
+            SearchLocationResultsFragment fragment = SearchLocationResultsFragment.newInstance(location);
+            updateDetailsContainer(fragment);
+        } else {
+            mListener.onSearchEarthquakes(location);
+        }
+    }
+
     public interface OnFragmentInteractionListener {
         void onSearchEarthquakes(Date start, Date end);
+        void onSearchEarthquakes(String location);
     }
 }

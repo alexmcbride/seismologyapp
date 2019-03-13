@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
@@ -72,12 +73,24 @@ public class SearchEarthquakesFragment extends ChildFragment {
         Button chooseEndDate = view.findViewById(R.id.buttonEndDate);
         setDateListener(context, textEndDate, chooseEndDate, mEndDate);
 
-        Button buttonSearch = view.findViewById(R.id.buttonSearch);
-        buttonSearch.setOnClickListener(new View.OnClickListener() {
+        Button buttonDateSearch = view.findViewById(R.id.buttonDateSearch);
+        buttonDateSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
                     mListener.onSearchEarthquakes(mStartDate.getTime(), mEndDate.getTime());
+                }
+            }
+        });
+
+        final SearchView searchLocation = view.findViewById(R.id.searchLocation);
+        Button buttonLocationSearch = view.findViewById(R.id.buttonLocationSearch);
+        buttonLocationSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    String query = searchLocation.getQuery().toString();
+                    mListener.onSearchEarthquakes(query);
                 }
             }
         });
@@ -122,5 +135,6 @@ public class SearchEarthquakesFragment extends ChildFragment {
 
     public interface OnFragmentInteractionListener {
         void onSearchEarthquakes(Date start, Date end);
+        void onSearchEarthquakes(String location);
     }
 }

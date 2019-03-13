@@ -125,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onSearchEarthquakes(String location) {
+        Intent intent = SearchResultsActivity.newInstance(this, location);
+        startActivity(intent);
+    }
+
+    @Override
     public void onEarthquakeSelected(long id) {
         Intent intent = EarthquakeDetailActivity.newInstance(this, id);
         startActivity(intent);
