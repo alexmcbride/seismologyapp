@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 class EarthquakeDbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "earthquake-db";
-    private static final int DB_VERSION = 16;
+    private static final int DB_VERSION = 17;
 
     EarthquakeDbHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -21,7 +21,7 @@ class EarthquakeDbHelper extends SQLiteOpenHelper {
                 "title TEXT," +
                 "description TEXT," +
                 "link TEXT," +
-                "pubDate INTEGER," +
+                "pubDate DATE," +
                 "category TEXT," +
                 "lat REAL," +
                 "lon REAL," +

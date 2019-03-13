@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.alexmcbride.android.seismologyapp.Util;
 import com.google.common.collect.Lists;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -141,7 +143,7 @@ public class EarthquakeRepository implements AutoCloseable {
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
              Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
                      "pubDate BETWEEN ? AND ?",
-                     new String[]{String.valueOf(start.getTime()), String.valueOf(end.getTime())},
+                     new String[]{Util.formatIso8601(start), Util.formatIso8601(end)},
                      null,
                      null,
                      orderBy,

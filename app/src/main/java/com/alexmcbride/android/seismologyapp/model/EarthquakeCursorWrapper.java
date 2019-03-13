@@ -3,7 +3,7 @@ package com.alexmcbride.android.seismologyapp.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import java.util.Date;
+import com.alexmcbride.android.seismologyapp.Util;
 
 class EarthquakeCursorWrapper extends android.database.CursorWrapper {
     EarthquakeCursorWrapper(Cursor cursor) {
@@ -16,7 +16,7 @@ class EarthquakeCursorWrapper extends android.database.CursorWrapper {
         earthquake.setTitle(getString(1));
         earthquake.setDescription(getString(2));
         earthquake.setLink(getString(3));
-        earthquake.setPubDate(new Date(getLong(4)));
+        earthquake.setPubDate(Util.parseIso8601(getString(4)));
         earthquake.setCategory(getString(5));
         earthquake.setLat(getDouble(6));
         earthquake.setLon(getDouble(7));
@@ -31,7 +31,7 @@ class EarthquakeCursorWrapper extends android.database.CursorWrapper {
         contentValues.put("title", earthquake.getTitle());
         contentValues.put("description", earthquake.getDescription());
         contentValues.put("link", earthquake.getLink());
-        contentValues.put("pubDate", earthquake.getPubDate().getTime());
+        contentValues.put("pubDate", Util.formatIso8601(earthquake.getPubDate()));
         contentValues.put("category", earthquake.getCategory());
         contentValues.put("lat", earthquake.getLat());
         contentValues.put("lon", earthquake.getLon());
