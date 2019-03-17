@@ -86,11 +86,20 @@ public class EarthquakeRepository implements AutoCloseable {
         return earthquakes;
     }
 
+    public List<Earthquake> getEarthquakesByLocation(String location, boolean ascending) {
+        return getEarthquakesInternal("location " + getAscOrDesc(ascending),
+                "LOWER(location) LIKE ?", new String[]{"%" + location.toLowerCase() + "%"});
+    }
+
     private List<Earthquake> getEarthquakesInternal(String orderBy) {
+        return getEarthquakesInternal(orderBy, null, null);
+    }
+
+    private List<Earthquake> getEarthquakesInternal(String orderBy, String selection, String[] selectionArgs) {
         List<Earthquake> earthquakes = Lists.newArrayList();
         try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
-             Cursor cursor = db.query(EARTHQUAKES_TABLE, null, null,
-                     null, null, null, orderBy)) {
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null, selection,
+                     selectionArgs, null, null, orderBy)) {
             if (cursor.moveToFirst()) {
                 EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
                 do {
