@@ -49,6 +49,12 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     public void onSearchEarthquakes(Date start, Date end) {
         if (hasDetailsContainer()) {
             SearchDateResultsFragment fragment = SearchDateResultsFragment.newInstance(start, end);
+            fragment.setListener(new SearchDateResultsFragment.OnFragmentInteractionListener() {
+                @Override
+                public void onEarthquakeSelected(long id) {
+                    mListener.onEarthquakeSelected(id);
+                }
+            });
             updateDetailsContainer(fragment);
         } else {
             mListener.onSearchEarthquakes(start, end);
@@ -59,6 +65,12 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     public void onSearchEarthquakes(String location) {
         if (hasDetailsContainer()) {
             SearchLocationResultsFragment fragment = SearchLocationResultsFragment.newInstance(location);
+            fragment.setListener(new SearchLocationResultsFragment.OnFragmentInteractionListener() {
+                @Override
+                public void onEarthquakeSelected(long id) {
+                    mListener.onEarthquakeSelected(id);
+                }
+            });
             updateDetailsContainer(fragment);
         } else {
             mListener.onSearchEarthquakes(location);
@@ -68,5 +80,6 @@ public class SearchMasterDetailFragment extends MasterDetailFragment implements 
     public interface OnFragmentInteractionListener {
         void onSearchEarthquakes(Date start, Date end);
         void onSearchEarthquakes(String location);
+        void onEarthquakeSelected(long id);
     }
 }

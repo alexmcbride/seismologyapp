@@ -27,6 +27,7 @@ public class SearchDateResultsFragment extends ChildFragment {
     private Date mStartDate;
     private Date mEndDate;
     private EarthquakeRepository mEarthquakeRepository;
+    private OnFragmentInteractionListener mListener;
 
     public static SearchDateResultsFragment newInstance(Date start, Date end) {
         SearchDateResultsFragment fragment = new SearchDateResultsFragment();
@@ -35,6 +36,10 @@ public class SearchDateResultsFragment extends ChildFragment {
         args.putLong(ARG_END_TIME, end.getTime());
         fragment.setArguments(args);
         return fragment;
+    }
+
+    void setListener(OnFragmentInteractionListener listener) {
+        mListener = listener;
     }
 
     @Override
@@ -107,7 +112,7 @@ public class SearchDateResultsFragment extends ChildFragment {
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
             SearchResult searchResult = mSearchResults.get(position);
-            Earthquake earthquake = searchResult.getEarthquake();
+            final Earthquake earthquake = searchResult.getEarthquake();
             View view = viewHolder.itemView;
 
             TextView textTitle = view.findViewById(R.id.textTitle);
@@ -130,6 +135,13 @@ public class SearchDateResultsFragment extends ChildFragment {
 
             TextView textMagnitude = view.findViewById(R.id.textMagnitude);
             textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude()));
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onEarthquakeSelected(earthquake.getId());
+                }
+            });
         }
 
         @Override
@@ -142,5 +154,9 @@ public class SearchDateResultsFragment extends ChildFragment {
         ResultViewHolder(@NonNull View itemView) {
             super(itemView);
         }
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onEarthquakeSelected(long id);
     }
 }

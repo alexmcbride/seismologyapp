@@ -19,9 +19,14 @@ public class SearchLocationResultsFragment extends ChildFragment {
 
     private String mLocation;
     private EarthquakeRepository mEarthquakeRepository;
+    private OnFragmentInteractionListener mListener;
 
     public SearchLocationResultsFragment() {
         // Required empty public constructor
+    }
+
+    void setListener(OnFragmentInteractionListener listener) {
+        mListener = listener;
     }
 
     public static SearchLocationResultsFragment newInstance(String location) {
@@ -44,7 +49,7 @@ public class SearchLocationResultsFragment extends ChildFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search_results, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_location_results, container, false);
 
         List<Earthquake> earthquakes = mEarthquakeRepository.getEarthquakesByLocation(mLocation, true);
         LocationResultsAdapter adapter = new LocationResultsAdapter(earthquakes);
@@ -84,13 +89,20 @@ public class SearchLocationResultsFragment extends ChildFragment {
 
         @Override
         public void onBindViewHolder(@NonNull ResultViewHolder resultViewHolder, int position) {
-            Earthquake earthquake = mEarthquakes.get(position);
+            final Earthquake earthquake = mEarthquakes.get(position);
             resultViewHolder.textTitle.setText(earthquake.getLocation());
             resultViewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             resultViewHolder.textDepth.setText(depth);
             String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());
             resultViewHolder.textMagnitude.setText(magnitude);
+
+            resultViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onEarthquakeSelected(earthquake.getId());
+                }
+            });
         }
 
         @Override
@@ -112,5 +124,9 @@ public class SearchLocationResultsFragment extends ChildFragment {
             textDepth = itemView.findViewById(R.id.textDepth);
             textMagnitude = itemView.findViewById(R.id.textMagnitude);
         }
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onEarthquakeSelected(long id);
     }
 }

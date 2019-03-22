@@ -14,7 +14,7 @@ import java.util.Objects;
  * Activity used to display a single set of search results, typically used when the device is in
  * portrait mode.
  */
-public class SearchResultsActivity extends AppCompatActivity {
+public class SearchResultsActivity extends AppCompatActivity implements SearchLocationResultsFragment.OnFragmentInteractionListener, SearchDateResultsFragment.OnFragmentInteractionListener {
     private static final String ARG_START_DATE = "ARG_START_DATE";
     private static final String ARG_END_DATE = "ARG_END_DATE";
     private static final String ARG_LOCATION = "ARG_LOCATION";
@@ -55,9 +55,18 @@ public class SearchResultsActivity extends AppCompatActivity {
 
     private Fragment getFragment(Date start, Date end, String location) {
         if (location != null) {
-            return SearchLocationResultsFragment.newInstance(location);
+            SearchLocationResultsFragment fragment = SearchLocationResultsFragment.newInstance(location);
+            fragment.setListener(this);
+            return fragment;
         } else {
-            return SearchDateResultsFragment.newInstance(start, end);
+            SearchDateResultsFragment fragment = SearchDateResultsFragment.newInstance(start, end);
+            fragment.setListener(this);
+            return fragment;
         }
+    }
+
+    @Override
+    public void onEarthquakeSelected(long id) {
+        startActivity(EarthquakeDetailActivity.newInstance(this, id));
     }
 }
