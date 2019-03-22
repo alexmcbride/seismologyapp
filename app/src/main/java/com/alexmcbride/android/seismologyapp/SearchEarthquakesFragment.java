@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.SearchView;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
@@ -25,10 +25,13 @@ import java.util.Objects;
 public class SearchEarthquakesFragment extends ChildFragment {
     private static final String ARG_START_DATE = "SEARCH_START_DATE";
     private static final String ARG_END_DATE = "SEARCH_END_DATE";
+    private static final String ARG_SEARCH_TEXT = "SEARCH_TEXT";
     private OnFragmentInteractionListener mListener;
 
     private Calendar mStartDate = Calendar.getInstance();
     private Calendar mEndDate = Calendar.getInstance();
+    private EditText mTextSearch;
+    private String mSearchText;
 
     public SearchEarthquakesFragment() {
         // Required empty public constructor
@@ -83,13 +86,14 @@ public class SearchEarthquakesFragment extends ChildFragment {
             }
         });
 
-        final SearchView searchLocation = view.findViewById(R.id.searchLocation);
-        Button buttonLocationSearch = view.findViewById(R.id.buttonLocationSearch);
-        buttonLocationSearch.setOnClickListener(new View.OnClickListener() {
+        mTextSearch = view.findViewById(R.id.searchLocation);
+        mTextSearch.setText(mSearchText);
+        Button buttonTextLocation = view.findViewById(R.id.buttonLocationSearch);
+        buttonTextLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    String query = searchLocation.getQuery().toString();
+                    String query = mTextSearch.getText().toString();
                     mListener.onSearchEarthquakes(query);
                 }
             }
@@ -123,6 +127,7 @@ public class SearchEarthquakesFragment extends ChildFragment {
     public void loadSavedState(Bundle bundle) {
         mStartDate = (Calendar) bundle.getSerializable(ARG_START_DATE);
         mEndDate = (Calendar) bundle.getSerializable(ARG_END_DATE);
+        mSearchText = bundle.getString(ARG_SEARCH_TEXT);
     }
 
     @Override
@@ -130,6 +135,7 @@ public class SearchEarthquakesFragment extends ChildFragment {
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_START_DATE, mStartDate);
         bundle.putSerializable(ARG_END_DATE, mEndDate);
+        bundle.putString(ARG_SEARCH_TEXT, mTextSearch.getText().toString());
         return bundle;
     }
 
