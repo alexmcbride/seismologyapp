@@ -16,11 +16,16 @@ import static org.junit.Assert.assertEquals;
 public class EarthquakeRssReaderTest {
     @Test
     public void testParseXml() throws Exception {
-        TestableEarthquakeRssReader earthquakeRssReader = new TestableEarthquakeRssReader();
+        EarthquakeRssReader earthquakeRssReader = new TestableEarthquakeRssReader();
+
         List<Earthquake> earthquakes = earthquakeRssReader.parse("http://www.example.com/earthquakes.xml");
+
         assertEquals(2, earthquakes.size());
     }
 
+    /*
+     * Test implementation that overrides the input stream source to provide our mock XML.
+     */
     private class TestableEarthquakeRssReader extends EarthquakeRssReader {
         private static final String FAKE_EARTHQUAKES_XML = "<?xml version=\"1.0\"?>\n" +
                 "<rss version=\"2.0\" xmlns:geo=\"http://www.w3.org/2003/01/geo/wgs84_pos#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n" +
@@ -58,7 +63,8 @@ public class EarthquakeRssReaderTest {
 
         @Override
         protected InputStream getInputStream(URLConnection connection) {
-            return new ByteArrayInputStream(FAKE_EARTHQUAKES_XML.getBytes(StandardCharsets.UTF_8));
+            byte[] bytes = FAKE_EARTHQUAKES_XML.getBytes(StandardCharsets.UTF_8);
+            return new ByteArrayInputStream(bytes);
         }
     }
 }
