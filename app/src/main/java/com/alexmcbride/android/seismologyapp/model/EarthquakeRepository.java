@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import com.alexmcbride.android.seismologyapp.Util;
 import com.google.common.collect.Lists;
 
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
