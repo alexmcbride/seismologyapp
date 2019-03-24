@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements
 
         // Add fragments to adapter.
         FragmentsPagerAdapter fragmentsPagerAdapter = new FragmentsPagerAdapter(getSupportFragmentManager());
-        fragmentsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
         fragmentsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
+        fragmentsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
         fragmentsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
 
         // Set up the ViewPager with the fragment adapter.
