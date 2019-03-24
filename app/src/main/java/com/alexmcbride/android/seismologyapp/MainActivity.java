@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements
         mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
         mFirstRun = preferences.getBoolean(ARG_FIRST_RUN, true);
 
+        // Init DB
         mEarthquakeRepository = new EarthquakeRepository(this);
 
         // Init timer stuff.

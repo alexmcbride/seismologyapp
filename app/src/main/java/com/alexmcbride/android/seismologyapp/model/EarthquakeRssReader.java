@@ -18,9 +18,16 @@ import java.util.Locale;
 public class EarthquakeRssReader {
     private static final SimpleDateFormat PUB_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
 
+    /*
+     * Allows source of input stream to be overridden in unit test
+     */
+    protected InputStream getInputStream(URLConnection connection) throws IOException {
+        return connection.getInputStream();
+    }
+
     public List<Earthquake> parse(String url) throws IOException, XmlPullParserException, ParseException {
         URLConnection connection = new URL(url).openConnection();
-        try (InputStream source = connection.getInputStream()) {
+        try (InputStream source = getInputStream(connection)) {
             return parseXml(source);
         }
     }
