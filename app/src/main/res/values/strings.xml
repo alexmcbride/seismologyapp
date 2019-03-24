@@ -25,4 +25,6 @@
     <string name="search_earthquakes_location_title">Search for earthquakes by location</string>
     <string name="search_location_earthquake_results">Search Location</string>
     <string name="search_location_hint">Enter location</string>
+    <string name="earthquake_update_failed">Update earthquakes failed</string>
+    <string name="earthquake_update_continue">Continue?</string>
 </resources>

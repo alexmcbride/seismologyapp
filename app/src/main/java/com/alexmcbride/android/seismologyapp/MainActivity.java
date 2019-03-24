@@ -39,15 +39,13 @@ public class MainActivity extends AppCompatActivity implements
     private static final int UPDATE_DELAY_MILLIS = 1000 * 60;//1 min
 
     private ViewPager mViewPager;
-    private SearchMasterDetailFragment mSearchMasterDetailFragment;
     private ListMasterDetailFragment mListMasterDetailFragment;
-    private EarthquakeMapFragment mEarthquakeMapFragment;
     private Handler mUpdateHandler = new Handler();
     private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable;
     private Snackbar mUpdateSnackbar;
     private Snackbar mUpdateFailedSnackbar;
     private boolean mFirstRun;
-    ;
+    private EarthquakeRepository mEarthquakeRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +56,15 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         // Create fragments for the view pager.
-        mSearchMasterDetailFragment = SearchMasterDetailFragment.newInstance();
+        SearchMasterDetailFragment searchMasterDetailFragment = SearchMasterDetailFragment.newInstance();
         mListMasterDetailFragment = ListMasterDetailFragment.newInstance();
-        mEarthquakeMapFragment = EarthquakeMapFragment.newInstance();
+        EarthquakeMapFragment earthquakeMapFragment = EarthquakeMapFragment.newInstance();
 
         // Add fragments to adapter.
         FragmentsPagerAdapter fragmentsPagerAdapter = new FragmentsPagerAdapter(getSupportFragmentManager());
         fragmentsPagerAdapter.addPage(mListMasterDetailFragment, "Earthquakes");
-        fragmentsPagerAdapter.addPage(mSearchMasterDetailFragment, "Search");
-        fragmentsPagerAdapter.addPage(mEarthquakeMapFragment, "Map");
+        fragmentsPagerAdapter.addPage(searchMasterDetailFragment, "Search");
+        fragmentsPagerAdapter.addPage(earthquakeMapFragment, "Map");
 
         // Set up the ViewPager with the fragment adapter.
         mViewPager = findViewById(R.id.container);
@@ -80,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         mViewPager.setCurrentItem(preferences.getInt(ARG_SELECTED_PAGE, 0));
         mFirstRun = preferences.getBoolean(ARG_FIRST_RUN, true);
+
+        mEarthquakeRepository = new EarthquakeRepository(this);
 
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
@@ -156,22 +156,16 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void updateFragments() {
-        mListMasterDetailFragment.earthquakesUpdated();
-    }
-
     private void earthquakesUpdated(final List<Earthquake> earthquakes) {
         // Add to database.
+        Log.d(TAG, "Received earthquakes: " + earthquakes.size());
         if (earthquakes.size() > 0) {
-            Log.d(TAG, "Received earthquakes: " + earthquakes.size());
             showUpdateSnackbar(earthquakes.size(), new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    updateFragments();
+                    mListMasterDetailFragment.earthquakesUpdated();
                 }
             });
-        } else {
-            Log.d(TAG, "No new earthquakes found.");
         }
     }
 
@@ -193,16 +187,16 @@ public class MainActivity extends AppCompatActivity implements
             mUpdateFailedSnackbar.dismiss();
         }
 
+        // Ask user if they want to keep updating
         View container = findViewById(R.id.container);
-        String message = "Update earthquakes failed";
+        String message = getString(R.string.earthquake_update_failed);
         mUpdateFailedSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
-        mUpdateFailedSnackbar.setAction("Continue?", new View.OnClickListener() {
+        mUpdateFailedSnackbar.setAction(R.string.earthquake_update_continue, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startDownloadTaskDelayed();
             }
         });
-
         mUpdateFailedSnackbar.show();
     }
 
@@ -215,22 +209,18 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void run() {
-            new DownloadEarthquakesAsyncTask(mMainActivity).execute(UPDATE_URL);
+            new DownloadEarthquakesAsyncTask(mMainActivity, mEarthquakeRepository).execute(UPDATE_URL);
         }
     }
 
     private static class DownloadEarthquakesAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
-        // Store activity as a WeakReference to prevent memory leaks
-        private WeakReference<MainActivity> mActivityReference;
+        private final EarthquakeRepository mEarthquakeRepository;
+        private WeakReference<MainActivity> mActivityReference; // Store activity as a WeakReference to prevent memory leaks
         private Exception mException;
 
-        DownloadEarthquakesAsyncTask(MainActivity activityReference) {
+        DownloadEarthquakesAsyncTask(MainActivity activityReference, EarthquakeRepository earthquakeRepository) {
             mActivityReference = new WeakReference<>(activityReference);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            Log.d(TAG, "Starting download earthquakes task...");
+            mEarthquakeRepository = earthquakeRepository;
         }
 
         @Override
@@ -239,8 +229,7 @@ public class MainActivity extends AppCompatActivity implements
             EarthquakeRssReader earthquakeRssReader = new EarthquakeRssReader();
             try {
                 List<Earthquake> earthquakes = earthquakeRssReader.parse(url);
-                EarthquakeRepository repository = new EarthquakeRepository(mActivityReference.get());
-                return repository.addEarthquakes(earthquakes);
+                return mEarthquakeRepository.addEarthquakes(earthquakes);
             } catch (Exception e) {
                 mException = e;
                 return Lists.newArrayList();
@@ -251,9 +240,7 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(List<Earthquake> earthquakes) {
             MainActivity activity = mActivityReference.get();
             if (mException == null) {
-                if (earthquakes.size() > 0) {
-                    activity.earthquakesUpdated(earthquakes);
-                }
+                activity.earthquakesUpdated(earthquakes);
                 activity.startDownloadTaskDelayed();
             } else {
                 Log.d(TAG, mException.toString());
@@ -262,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // Manages collection fragments for the view pager.
+    // Manages collection pages for the view pager.
     private class FragmentsPagerAdapter extends FragmentPagerAdapter {
         private List<Page> mPageList = Lists.newArrayList();
 
