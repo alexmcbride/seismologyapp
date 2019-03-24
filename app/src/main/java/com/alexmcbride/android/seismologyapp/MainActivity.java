@@ -46,7 +46,9 @@ public class MainActivity extends AppCompatActivity implements
     private Handler mUpdateHandler = new Handler();
     private DownloadEarthquakesRunnable mDownloadEarthquakesRunnable;
     private Snackbar mUpdateSnackbar;
+    private Snackbar mUpdateFailedSnackbar;
     private boolean mFirstRun;
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +188,25 @@ public class MainActivity extends AppCompatActivity implements
         mUpdateHandler.removeCallbacks(mDownloadEarthquakesRunnable);
     }
 
+    private void showUpdateFailedSnackbar() {
+        // If snackbar already displayed dismiss it.
+        if (mUpdateFailedSnackbar != null && mUpdateFailedSnackbar.isShown()) {
+            mUpdateFailedSnackbar.dismiss();
+        }
+
+        View container = findViewById(R.id.container);
+        String message = "Update earthquakes failed";
+        mUpdateFailedSnackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
+        mUpdateFailedSnackbar.setAction("Continue?", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startDownloadTaskDelayed();
+            }
+        });
+
+        mUpdateFailedSnackbar.show();
+    }
+
     private class DownloadEarthquakesRunnable implements Runnable {
         private final MainActivity mMainActivity;
 
@@ -196,13 +217,11 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void run() {
             new DownloadEarthquakesAsyncTask(mMainActivity).execute(UPDATE_URL);
-
-            // Trigger next tick of timer.
-            startDownloadTaskDelayed();
         }
     }
 
     private static class DownloadEarthquakesAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
+        // Store activity as a WeakReference to prevent memory leaks
         private WeakReference<MainActivity> mActivityReference;
         private Exception mException;
 
@@ -225,18 +244,21 @@ public class MainActivity extends AppCompatActivity implements
                 return repository.addEarthquakes(earthquakes);
             } catch (Exception e) {
                 mException = e;
-                return null;
+                return Lists.newArrayList();
             }
         }
 
         @Override
         protected void onPostExecute(List<Earthquake> earthquakes) {
+            MainActivity activity = mActivityReference.get();
             if (mException == null) {
-                MainActivity mainActivity = mActivityReference.get();
-                mainActivity.earthquakesUpdated(earthquakes);
+                if (earthquakes.size() > 0) {
+                    activity.earthquakesUpdated(earthquakes);
+                }
+                activity.startDownloadTaskDelayed();
             } else {
                 Log.d(TAG, mException.toString());
-                Toast.makeText(mActivityReference.get(), "Error: " + mException.getMessage(), Toast.LENGTH_SHORT).show();
+                activity.showUpdateFailedSnackbar();
             }
         }
     }
