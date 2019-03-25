@@ -95,7 +95,7 @@ public class SearchDateResultsFragment extends ChildFragment {
         return new Bundle();
     }
 
-    private class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class ResultsAdapter extends RecyclerView.Adapter<ResultViewHolder> {
         private final List<SearchResult> mSearchResults;
 
         ResultsAdapter(List<SearchResult> searchResults) {
@@ -104,39 +104,25 @@ public class SearchDateResultsFragment extends ChildFragment {
 
         @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        public ResultViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
             View view = getLayoutInflater().inflate(R.layout.list_item_search_result, viewGroup, false);
             return new ResultViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        public void onBindViewHolder(@NonNull ResultViewHolder viewHolder, int position) {
             SearchResult searchResult = mSearchResults.get(position);
             final Earthquake earthquake = searchResult.getEarthquake();
-            View view = viewHolder.itemView;
 
-            TextView textTitle = view.findViewById(R.id.textTitle);
-            textTitle.setText(searchResult.getTitle());
+            viewHolder.textTitle.setText(searchResult.getTitle());
+            viewHolder.textLocation.setText(earthquake.getLocation());
+            viewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
+            viewHolder.textLat.setText(getString(R.string.earthquake_list_item_latitude, earthquake.getLat()));
+            viewHolder.textLon.setText(getString(R.string.earthquake_list_item_longitude, earthquake.getLon()));
+            viewHolder.textDepth.setText(getString(R.string.earthquake_list_item_depth, earthquake.getDepth()));
+            viewHolder.textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude()));
 
-            TextView textLocation = view.findViewById(R.id.textLocation);
-            textLocation.setText(earthquake.getLocation());
-
-            TextView textPubDate = view.findViewById(R.id.textPubDate);
-            textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
-
-            TextView textLat = view.findViewById(R.id.textLat);
-            textLat.setText(getString(R.string.earthquake_list_item_latitude, earthquake.getLat()));
-
-            TextView textLon = view.findViewById(R.id.textLon);
-            textLon.setText(getString(R.string.earthquake_list_item_longitude, earthquake.getLon()));
-
-            TextView textDepth = view.findViewById(R.id.textDepth);
-            textDepth.setText(getString(R.string.earthquake_list_item_depth, earthquake.getDepth()));
-
-            TextView textMagnitude = view.findViewById(R.id.textMagnitude);
-            textMagnitude.setText(getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude()));
-
-            view.setOnClickListener(new View.OnClickListener() {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.onEarthquakeSelected(earthquake.getId());
@@ -150,9 +136,24 @@ public class SearchDateResultsFragment extends ChildFragment {
         }
     }
 
-    public static class ResultViewHolder extends RecyclerView.ViewHolder {
+    static class ResultViewHolder extends RecyclerView.ViewHolder {
+        TextView textTitle;
+        TextView textLocation;
+        TextView textPubDate;
+        TextView textLat;
+        TextView textLon;
+        TextView textDepth;
+        TextView textMagnitude;
+
         ResultViewHolder(@NonNull View itemView) {
             super(itemView);
+            textTitle = itemView.findViewById(R.id.textTitle);
+            textLocation = itemView.findViewById(R.id.textLocation);
+            textPubDate = itemView.findViewById(R.id.textPubDate);
+            textLat = itemView.findViewById(R.id.textLat);
+            textLon = itemView.findViewById(R.id.textLon);
+            textDepth = itemView.findViewById(R.id.textDepth);
+            textMagnitude = itemView.findViewById(R.id.textMagnitude);
         }
     }
 

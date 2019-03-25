@@ -37,9 +37,14 @@ import javax.annotation.Nullable;
  * which means a bunch of services and permissions.
  */
 public class EarthquakeListFragment extends ChildFragment implements AdapterView.OnItemSelectedListener {
+    private static final double DEFAULT_LATITUDE = 54.971516;
+    private static final double DEFAULT_LONGITUDE = -2.462196;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final String ARG_SELECTED_SORT_OPTION = "ARG_SELECTED_SORT_OPTION";
     private static final String ARG_SELECTED_SORT_DIRECTION = "ARG_SELECTED_SORT_DIRECTION";
+    private static final String ARG_LAST_LATITUDE = "ARG_LAST_LATITUDE";
+    private static final String ARG_LAST_LONGITUDE = "ARG_LAST_LONGITUDE";
+    private static final String ARG_LOCATION_SET = "ARG_LOCATION_SET";
     private OnFragmentInteractionListener mListener;
     private EarthquakeRepository mEarthquakeRepository;
     private RecyclerView mRecyclerViewEarthquakes;
@@ -48,7 +53,9 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     private ArrayAdapter<CharSequence> mSpinnerOptionsAdapter;
     private ArrayAdapter<CharSequence> mSpinnerDirectionAdapter;
     private LocationManager mLocationManager;
-    private Location mLastLocation;
+    private double mLastLatitude;
+    private double mLastLongitude;
+    private boolean mLocationSet = false;
 
     public EarthquakeListFragment() {
         // Required empty public constructor
@@ -74,11 +81,22 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
             // todo: rewrite to use more modern fused location provider
             // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
             // Try first get GPS, fallback to network.
-            mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (mLastLocation == null) {
-                mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location location = getLocationOrFallback();
+            if (location != null) {
+                mLastLatitude = location.getLatitude();
+                mLastLongitude = location.getLongitude();
+                mLocationSet = true;
             }
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private Location getLocationOrFallback() {
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null) {
+            location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+        return location;
     }
 
     private boolean checkLocationPermission() {
@@ -138,6 +156,15 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
         mSpinnerOptions.setSelection(preferences.getInt(ARG_SELECTED_SORT_OPTION, 0));
         mSpinnerDirection.setSelection(preferences.getInt(ARG_SELECTED_SORT_DIRECTION, 0));
+        mLastLatitude = Double.longBitsToDouble(preferences.getLong(ARG_LAST_LATITUDE, 0));
+        mLastLongitude = Double.longBitsToDouble(preferences.getLong(ARG_LAST_LONGITUDE, 0));
+        mLocationSet = preferences.getBoolean(ARG_LOCATION_SET, false);
+
+        // If no location then default to centre of UK.
+        if (!mLocationSet) {
+            mLastLatitude = DEFAULT_LATITUDE;
+            mLastLongitude = DEFAULT_LONGITUDE;
+        }
 
         // Init DB and load earthquakes.
         mEarthquakeRepository = new EarthquakeRepository(getActivity());
@@ -160,12 +187,14 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // Save spinner state.
         Activity activity = Objects.requireNonNull(getActivity());
         SharedPreferences preferences = activity.getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerOptions.getSelectedItemPosition());
         editor.putInt(ARG_SELECTED_SORT_DIRECTION, mSpinnerDirection.getSelectedItemPosition());
+        editor.putLong(ARG_LAST_LATITUDE, Double.doubleToLongBits(mLastLatitude));
+        editor.putLong(ARG_LAST_LONGITUDE, Double.doubleToLongBits(mLastLongitude));
+        editor.putBoolean(ARG_LOCATION_SET, mLocationSet);
         editor.apply();
     }
 
@@ -214,9 +243,8 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
     }
 
     private List<Earthquake> getSortedEarthquakes(String sortOption, boolean sortDirection) {
-        if (sortOption.equalsIgnoreCase("nearest") && mLastLocation != null) {
-            return mEarthquakeRepository.getEarthquakesByNearest(mLastLocation.getLatitude(),
-                    mLastLocation.getLongitude(), sortDirection);
+        if (sortOption.equalsIgnoreCase("nearest")) {
+            return mEarthquakeRepository.getEarthquakesByNearest(mLastLatitude, mLastLongitude, sortDirection);
         } else if (sortOption.equalsIgnoreCase("date")) {
             return mEarthquakeRepository.getEarthquakesByDate(sortDirection);
         } else if (sortOption.equalsIgnoreCase("location")) {
@@ -226,11 +254,11 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         } else if (sortOption.equalsIgnoreCase("magnitude")) {
             return mEarthquakeRepository.getEarthquakesByMagnitude(sortDirection);
         } else {
-            return null; // nothing
+            return null; // nothing yo
         }
     }
 
-    private class EarthquakesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class EarthquakesAdapter extends RecyclerView.Adapter<EarthquakeViewHolder> {
         private final List<Earthquake> mEarthquakes;
 
         EarthquakesAdapter(List<Earthquake> earthquakes) {
@@ -240,36 +268,28 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
 
         @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        public EarthquakeViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
             View view = getLayoutInflater().inflate(R.layout.list_item_earthquake, viewGroup, false);
             return new EarthquakeViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        public void onBindViewHolder(@NonNull EarthquakeViewHolder viewHolder, int position) {
             final Earthquake earthquake = Objects.requireNonNull(mEarthquakes.get(position));
-            View view = viewHolder.itemView;
 
-            view.setOnClickListener(new View.OnClickListener() {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.onEarthquakeSelected(earthquake.getId());
                 }
             });
 
-            TextView textTitle = view.findViewById(R.id.textTitle);
-            textTitle.setText(earthquake.getLocation());
-
-            TextView textPubDate = view.findViewById(R.id.textPubDate);
-            textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
-
+            viewHolder.textTitle.setText(earthquake.getLocation());
+            viewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
-            TextView textDepth = view.findViewById(R.id.textDepth);
-            textDepth.setText(depth);
-
+            viewHolder.textDepth.setText(depth);
             String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());
-            TextView textMagnitude = view.findViewById(R.id.textMagnitude);
-            textMagnitude.setText(magnitude);
+            viewHolder.textMagnitude.setText(magnitude);
         }
 
         @Override
@@ -278,9 +298,18 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         }
     }
 
-    public class EarthquakeViewHolder extends RecyclerView.ViewHolder {
+    class EarthquakeViewHolder extends RecyclerView.ViewHolder {
+        TextView textTitle;
+        TextView textPubDate;
+        TextView textDepth;
+        TextView textMagnitude;
+
         EarthquakeViewHolder(@NonNull View itemView) {
             super(itemView);
+            textTitle = itemView.findViewById(R.id.textTitle);
+            textPubDate = itemView.findViewById(R.id.textPubDate);
+            textDepth = itemView.findViewById(R.id.textDepth);
+            textMagnitude = itemView.findViewById(R.id.textMagnitude);
         }
     }
 
