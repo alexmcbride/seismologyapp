@@ -116,7 +116,7 @@ public class SearchDateResultsFragment extends ChildFragment {
 
             viewHolder.textTitle.setText(searchResult.getTitle());
             viewHolder.textLocation.setText(earthquake.getLocation());
-            viewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
+            viewHolder.textPubDate.setText(DateUtil.formatDateTime(earthquake.getPubDate()));
             viewHolder.textLat.setText(getString(R.string.earthquake_list_item_latitude, earthquake.getLat()));
             viewHolder.textLon.setText(getString(R.string.earthquake_list_item_longitude, earthquake.getLon()));
             viewHolder.textDepth.setText(getString(R.string.earthquake_list_item_depth, earthquake.getDepth()));

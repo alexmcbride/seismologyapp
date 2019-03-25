@@ -75,12 +75,8 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         updateLastLocation();
     }
 
-    @SuppressLint("MissingPermission")
     private void updateLastLocation() {
         if (checkLocationPermission()) {
-            // todo: rewrite to use more modern fused location provider
-            // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
-            // Try first get GPS, fallback to network.
             Location location = getLocationOrFallback();
             if (location != null) {
                 mLastLatitude = location.getLatitude();
@@ -92,6 +88,9 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
 
     @SuppressLint("MissingPermission")
     private Location getLocationOrFallback() {
+        // todo: rewrite to use more modern fused location provider
+        // todo: https://developer.android.com/training/location/retrieve-current.html#GetLocation
+        // Try first get GPS, fallback to network.
         Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -285,7 +284,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
             });
 
             viewHolder.textTitle.setText(earthquake.getLocation());
-            viewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
+            viewHolder.textPubDate.setText(DateUtil.formatDateTime(earthquake.getPubDate()));
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             viewHolder.textDepth.setText(depth);
             String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());
@@ -298,7 +297,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         }
     }
 
-    class EarthquakeViewHolder extends RecyclerView.ViewHolder {
+    private class EarthquakeViewHolder extends RecyclerView.ViewHolder {
         TextView textTitle;
         TextView textPubDate;
         TextView textDepth;

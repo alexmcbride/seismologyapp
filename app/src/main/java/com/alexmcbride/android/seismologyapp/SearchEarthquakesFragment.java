@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,9 +67,9 @@ public class SearchEarthquakesFragment extends ChildFragment {
 
         final FragmentActivity context = Objects.requireNonNull(getActivity());
         final TextView textStartDate = view.findViewById(R.id.textStartDate);
-        textStartDate.setText(Util.formatDate(mStartDate.getTime()));
+        textStartDate.setText(DateUtil.formatDate(mStartDate.getTime()));
         final TextView textEndDate = view.findViewById(R.id.textEndDate);
-        textEndDate.setText(Util.formatDate(mEndDate.getTime()));
+        textEndDate.setText(DateUtil.formatDate(mEndDate.getTime()));
 
         Button chooseStartDate = view.findViewById(R.id.buttonStartDate);
         setDateListener(context, textStartDate, chooseStartDate, mStartDate);
@@ -118,7 +117,7 @@ public class SearchEarthquakesFragment extends ChildFragment {
                         calendar.set(Calendar.YEAR, year);
                         calendar.set(Calendar.MONTH, month);
                         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        textView.setText(Util.formatDate(calendar.getTime()));
+                        textView.setText(DateUtil.formatDate(calendar.getTime()));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
             }

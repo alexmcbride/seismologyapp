@@ -91,7 +91,7 @@ public class SearchLocationResultsFragment extends ChildFragment {
         public void onBindViewHolder(@NonNull ResultViewHolder resultViewHolder, int position) {
             final Earthquake earthquake = mEarthquakes.get(position);
             resultViewHolder.textTitle.setText(earthquake.getLocation());
-            resultViewHolder.textPubDate.setText(Util.formatPretty(earthquake.getPubDate()));
+            resultViewHolder.textPubDate.setText(DateUtil.formatDateTime(earthquake.getPubDate()));
             String depth = getString(R.string.earthquake_list_item_depth, earthquake.getDepth());
             resultViewHolder.textDepth.setText(depth);
             String magnitude = getString(R.string.earthquake_list_item_magnitude, earthquake.getMagnitude());

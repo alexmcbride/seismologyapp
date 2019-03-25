@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.Locale;
 
 /*
- * Some utility methods.
+ * Some date utility methods, yay for dates.
  */
 @SuppressWarnings("WeakerAccess")
-public class Util {
+public class DateUtil {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
@@ -22,7 +22,7 @@ public class Util {
         return TIME_FORMAT.format(date);
     }
 
-    public static String formatPretty(Date date) {
+    public static String formatDateTime(Date date) {
         return formatDate(date) + " - " + formatTime(date);
     }
 

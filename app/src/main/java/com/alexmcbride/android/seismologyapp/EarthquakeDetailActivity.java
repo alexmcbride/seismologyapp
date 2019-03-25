@@ -30,8 +30,7 @@ public class EarthquakeDetailActivity extends AppCompatActivity {
         // Load earthquake to view.
         if (savedInstanceState == null) {
             // Get ID of earthquake to display.
-            Intent intent = getIntent();
-            long id = intent.getLongExtra(ARG_EARTHQUAKE_ID, -1);
+            long id = getIntent().getLongExtra(ARG_EARTHQUAKE_ID, -1);
 
             // Load fragment.
             Fragment fragment = EarthquakeDetailFragment.newInstance(id);
