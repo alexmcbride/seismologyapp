@@ -12,12 +12,15 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class EarthquakeRssReaderTest {
+    private static final double DELTA = 1e-15;
+
     @Test
     public void testParseXml() throws Exception {
         EarthquakeRssReader earthquakeRssReader = new TestableEarthquakeRssReader();
@@ -25,6 +28,17 @@ public class EarthquakeRssReaderTest {
         List<Earthquake> earthquakes = earthquakeRssReader.parse("http://www.example.com/earthquakes.xml");
 
         assertEquals(2, earthquakes.size());
+        Earthquake e = earthquakes.get(0);
+        assertEquals("UK Earthquake alert : M  1.8 :ISLAY,ARGYLL AND BUTE, Sat, 16 Mar 2019 10:11:31", e.getTitle());
+        assertEquals("Origin date/time: Sat, 16 Mar 2019 10:11:31 ; Location: ISLAY,ARGYLL AND BUTE ; Lat/long: 55.794,-6.353 ; Depth: 7 km ; Magnitude:  1.8", e.getDescription());
+        assertEquals("http://earthquakes.bgs.ac.uk/earthquakes/recent_events/20190316101132.html", e.getLink());
+        assertEquals("EQUK", e.getCategory());
+        assertEquals(55.794, e.getLat(), DELTA);
+        assertEquals(-6.353, e.getLon(), DELTA);
+        assertEquals("Islay, Argyll and bute", e.getLocation());
+        assertEquals(7, e.getDepth(), DELTA);
+        assertEquals(1.8, e.getMagnitude(), DELTA);
+        assertEquals("Sat Mar 16 10:11:31 GMT 2019", e.getPubDate().toString());
     }
 
     /*

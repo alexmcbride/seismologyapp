@@ -1,3 +1,7 @@
+/*
+ * Name: Alex McBride
+ * Student ID: S1715224
+ */
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
@@ -7,6 +11,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.alexmcbride.android.seismologyapp.model.Earthquake;
 import com.alexmcbride.android.seismologyapp.model.EarthquakeDbHelper;
 import com.alexmcbride.android.seismologyapp.model.EarthquakeRepository;
+import com.alexmcbride.android.seismologyapp.model.SearchResult;
 import com.google.common.collect.Lists;
 
 import org.junit.After;
@@ -14,9 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.Assert.*;
 
@@ -90,7 +98,7 @@ public class EarthquakeRepositoryInstrumentedTest {
 
     private Date createPubDate(int min) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, 4, 4, 14, min);
+        calendar.set(2019, 4, 4, 14, min, 0);
         return calendar.getTime();
     }
 
@@ -200,5 +208,129 @@ public class EarthquakeRepositoryInstrumentedTest {
         Earthquake result = mRepository.getEarthquake(earthquake1.getId());
         assertNotNull(result);
         assertEquals(earthquake1.getTitle(), result.getTitle());
+    }
+
+    @Test
+    public void testGetEarthquakeSearchDate() {
+        Earthquake earthquake1 = createEarthquakeWithLatLon("Earthquake 1", 2.0, 2.0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake2.setPubDate(createPubDate(20));
+        Earthquake earthquake3 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake3.setPubDate(createPubDate(30));
+        List<Earthquake> earthquakes = Lists.newArrayList(earthquake1, earthquake2, earthquake3);
+        mRepository.addEarthquakes(earthquakes);
+
+        SearchResult result = mRepository.getNorthernmostEarthquake(createPubDate(15), createPubDate(25));
+
+        assertNotNull(result);
+        assertEquals("Northernmost", result.getTitle());
+        assertEquals("Earthquake 2", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetNorthernmostEarthquake() {
+        Earthquake earthquake1 = createEarthquakeWithLatLon("Earthquake 1", 2.0, 2.0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getNorthernmostEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Northernmost", result.getTitle());
+        assertEquals("Earthquake 2", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetSouthernmostEarthquake() {
+        Earthquake earthquake1 = createEarthquakeWithLatLon("Earthquake 1", 2.0, 2.0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getSouthernmostEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Southernmost", result.getTitle());
+        assertEquals("Earthquake 1", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetEasternmostEarthquake() {
+        Earthquake earthquake1 = createEarthquakeWithLatLon("Earthquake 1", 2.0, 2.0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getEasternmostEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Easternmost", result.getTitle());
+        assertEquals("Earthquake 2", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetWesternmostEarthquake() {
+        Earthquake earthquake1 = createEarthquakeWithLatLon("Earthquake 1", 2.0, 2.0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquakeWithLatLon("Earthquake 2", 3, 3.0);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getWesternmostEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Westernmost", result.getTitle());
+        assertEquals("Earthquake 1", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetLargestMagnitudeEarthquake() {
+        Earthquake earthquake1 = createEarthquake("Earthquake 1", 0, 2);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquake("Earthquake 2", 0, 3);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getLargestMagnitudeEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Largest Magnitude", result.getTitle());
+        assertEquals("Earthquake 2", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetLowestDepthEarthquake() {
+        Earthquake earthquake1 = createEarthquake("Earthquake 1", 2, 0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquake("Earthquake 2", 3, 0);
+        earthquake2.setPubDate(createPubDate(10));
+        addEarthquakes(earthquake1, earthquake2);
+
+        SearchResult result = mRepository.getLowestDepthEarthquake(createPubDate(1), createPubDate(59));
+
+        assertNotNull(result);
+        assertEquals("Lowest Depth", result.getTitle());
+        assertEquals("Earthquake 2", result.getEarthquake().getTitle());
+    }
+
+    @Test
+    public void testGetLowestAndHighestDate() {
+        Earthquake earthquake1 = createEarthquake("Earthquake 1", 2, 0);
+        earthquake1.setPubDate(createPubDate(10));
+        Earthquake earthquake2 = createEarthquake("Earthquake 2", 3, 0);
+        earthquake2.setPubDate(createPubDate(20));
+        addEarthquakes(earthquake1, earthquake2);
+
+        Date result1 = mRepository.getLowestDate();
+        Date result2 = mRepository.getHighestDate();
+
+        DateFormat sdf = new SimpleDateFormat("mm", Locale.ENGLISH);
+        assertEquals("10", sdf.format(result1));
+        assertEquals("20", sdf.format(result2));
     }
 }
