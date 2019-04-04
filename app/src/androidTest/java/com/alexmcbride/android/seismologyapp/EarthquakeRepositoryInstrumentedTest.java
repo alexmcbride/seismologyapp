@@ -88,9 +88,9 @@ public class EarthquakeRepositoryInstrumentedTest {
         return earthquake;
     }
 
-    private Date createPubDate(int hour, int min) {
+    private Date createPubDate(int min) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, 4, 4, hour, min);
+        calendar.set(2019, 4, 4, 14, min);
         return calendar.getTime();
     }
 
@@ -108,8 +108,8 @@ public class EarthquakeRepositoryInstrumentedTest {
 
     @Test
     public void testGetEarthquakes() {
-        Earthquake earthquake1 = createEarthquake("Earthquake 1", createPubDate(14, 19));
-        Earthquake earthquake2 = createEarthquake("Earthquake 2", createPubDate(14, 19));
+        Earthquake earthquake1 = createEarthquake("Earthquake 1", createPubDate(19));
+        Earthquake earthquake2 = createEarthquake("Earthquake 2", createPubDate(19));
         addEarthquakes(earthquake1, earthquake2);
 
         List<Earthquake> result = mRepository.getEarthquakes();
@@ -120,8 +120,8 @@ public class EarthquakeRepositoryInstrumentedTest {
 
     @Test
     public void testGetEarthquakesByDate() {
-        Earthquake earthquake1 = createEarthquake("Earthquake 1", createPubDate(14, 19));
-        Earthquake earthquake2 = createEarthquake("Earthquake 2", createPubDate(14, 20));
+        Earthquake earthquake1 = createEarthquake("Earthquake 1", createPubDate(19));
+        Earthquake earthquake2 = createEarthquake("Earthquake 2", createPubDate(20));
         addEarthquakes(earthquake1, earthquake2);
 
         assertEarthquakesEqual(mRepository.getEarthquakesByDate(true),  earthquake1, earthquake2);
@@ -189,5 +189,16 @@ public class EarthquakeRepositoryInstrumentedTest {
         assertEquals(2, result1.size());
         assertEquals(earthquake1.getTitle(), result1.get(0).getTitle());
         assertEquals(earthquake2.getTitle(), result1.get(1).getTitle());
+    }
+
+    @Test
+    public void testGetEarthquake() {
+        Earthquake earthquake1 = createEarthquake("Earthquake 1");
+        List<Earthquake> earthquakes = Lists.newArrayList(earthquake1);
+        mRepository.addEarthquakes(earthquakes);
+
+        Earthquake result = mRepository.getEarthquake(earthquake1.getId());
+        assertNotNull(result);
+        assertEquals(earthquake1.getTitle(), result.getTitle());
     }
 }
