@@ -1,7 +1,12 @@
+/*
+ * Name: Alex McBride
+ * Student ID: S1715224
+ */
 package com.alexmcbride.android.seismologyapp.model;
 
 import java.util.Date;
 
+@SuppressWarnings("WeakerAccess")
 public class Earthquake {
     private long id;
     private String mTitle;

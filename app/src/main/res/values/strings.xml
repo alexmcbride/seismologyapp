@@ -1,4 +1,8 @@
 <resources>
+<!--
+ * Name: Alex McBride
+ * Student ID: S1715224
+-->
     <string name="app_name">SeismologyApp</string>
     <string name="title_activity_main">SeismologyApp</string>
     <string name="action_settings">Settings</string>

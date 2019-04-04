@@ -1,3 +1,7 @@
+/*
+ * Name: Alex McBride
+ * Student ID: S1715224
+ */
 package com.alexmcbride.android.seismologyapp.model;
 
 import java.util.Comparator;
@@ -17,6 +21,7 @@ class EarthquakeDistanceComparator implements Comparator<Earthquake> {
         mAscending = ascending;
     }
 
+    // https://en.wikipedia.org/wiki/Haversine_formula
     private static double haversine(double lat1, double lon1, double lat2, double lon2) {
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);

@@ -1,3 +1,7 @@
+/*
+ * Name: Alex McBride
+ * Student ID: S1715224
+ */
 package com.alexmcbride.android.seismologyapp.model;
 
 import android.content.ContentValues;
@@ -38,8 +42,7 @@ public class EarthquakeRepository implements AutoCloseable {
 
     /*
      * Each earthquake has its own link to the BGS site, so we use that to check for uniqueness. We
-     * have a unique constraint setup on the link, so if a second is inserted then the method
-     * returns a -1.
+     * have a unique constraint setup on the link, so if another is inserted then it returns a -1.
      */
     private boolean addEarthquake(Earthquake earthquake) {
         try (SQLiteDatabase db = mDbHelper.getWritableDatabase()) {

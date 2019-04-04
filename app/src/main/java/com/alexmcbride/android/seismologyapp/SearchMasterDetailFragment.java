@@ -1,3 +1,7 @@
+/*
+ * Name: Alex McBride
+ * Student ID: S1715224
+ */
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
