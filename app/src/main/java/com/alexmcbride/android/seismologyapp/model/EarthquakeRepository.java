@@ -21,10 +21,15 @@ import java.util.List;
  */
 public class EarthquakeRepository implements AutoCloseable {
     private static final String EARTHQUAKES_TABLE = "earthquakes";
+    private static final String DB_NAME = "earthquake-db";
     private final EarthquakeDbHelper mDbHelper;
 
     public EarthquakeRepository(Context context) {
-        mDbHelper = new EarthquakeDbHelper(context);
+        this(new EarthquakeDbHelper(context, DB_NAME));
+    }
+
+    public EarthquakeRepository(EarthquakeDbHelper earthquakeDbHelper) {
+        mDbHelper = earthquakeDbHelper;
     }
 
     /*
@@ -70,7 +75,7 @@ public class EarthquakeRepository implements AutoCloseable {
     }
 
     public List<Earthquake> getEarthquakesByTitle(boolean ascending) {
-        return getEarthquakesInternal("location " + getAscOrDesc(ascending));
+        return getEarthquakesInternal("title " + getAscOrDesc(ascending));
     }
 
     public List<Earthquake> getEarthquakesByDepth(boolean ascending) {

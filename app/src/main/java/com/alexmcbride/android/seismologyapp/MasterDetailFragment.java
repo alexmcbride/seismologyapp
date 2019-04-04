@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 /*
  * Abstract fragment to manage master/detail relationship between child fragments. When in portrait
- * mode it shows only the master fragment. Inn landscape it shows with master and detail. Child
+ * mode it shows only the master fragment. In landscape it shows with master and detail. Child
  * classes implement their own functionality and call updateDetailsContainer() to update the
  * current details fragment.
  */

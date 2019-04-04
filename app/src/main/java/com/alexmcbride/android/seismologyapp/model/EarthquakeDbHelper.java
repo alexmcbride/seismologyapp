@@ -10,16 +10,40 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import javax.annotation.Nullable;
 
-class EarthquakeDbHelper extends SQLiteOpenHelper {
-    private static final String DB_NAME = "earthquake-db";
+public class EarthquakeDbHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 17;
 
-    EarthquakeDbHelper(@Nullable Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+    public EarthquakeDbHelper(@Nullable Context context, String dbName) {
+        super(context, dbName, null, DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createTables(db);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // On upgrading we just drop and re-create everything.
+        dropTables(db);
+        onCreate(db);
+    }
+
+    public void dropTables() {
+        SQLiteDatabase db = getWritableDatabase();
+        dropTables(db);
+    }
+
+    private void dropTables(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS earthquakes;");
+    }
+
+    public void createTables() {
+        SQLiteDatabase db = getWritableDatabase();
+        createTables(db);
+    }
+
+    private void createTables(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS earthquakes (" +
                 "_id INTEGER PRIMARY KEY," +
                 "title TEXT," +
@@ -37,12 +61,5 @@ class EarthquakeDbHelper extends SQLiteOpenHelper {
         // As each link links to a different event they should be unique, we use this to make sure
         // no duplicate earthquakes are added.
         db.execSQL("CREATE UNIQUE INDEX idx_links ON earthquakes (link);");
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // On upgrading we just drop and re-create everything.
-        db.execSQL("DROP TABLE IF EXISTS earthquakes;");
-        onCreate(db);
     }
 }
