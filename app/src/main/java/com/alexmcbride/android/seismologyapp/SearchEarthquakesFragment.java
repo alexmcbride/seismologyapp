@@ -51,10 +51,16 @@ public class SearchEarthquakesFragment extends ChildFragment {
         super.onCreate(savedInstanceState);
 
         EarthquakeRepository earthquakeRepository = new EarthquakeRepository(getActivity());
-        mStartDate.setTime(earthquakeRepository.getLowestDate());
+        Date lowest = earthquakeRepository.getLowestDate();
+        if (lowest != null) {
+            mStartDate.setTime(earthquakeRepository.getLowestDate());
+        }
         mStartDate.set(Calendar.HOUR_OF_DAY, 0);
         mStartDate.set(Calendar.MINUTE, 0);
-        mEndDate.setTime(earthquakeRepository.getHighestDate());
+        Date highest = earthquakeRepository.getHighestDate();
+        if (highest != null) {
+            mEndDate.setTime(highest);
+        }
         mEndDate.set(Calendar.HOUR_OF_DAY, 23);
         mEndDate.set(Calendar.MINUTE, 59);
     }
@@ -150,6 +156,7 @@ public class SearchEarthquakesFragment extends ChildFragment {
 
     public interface OnFragmentInteractionListener {
         void onSearchEarthquakes(Date start, Date end);
+
         void onSearchEarthquakes(String location);
     }
 }
