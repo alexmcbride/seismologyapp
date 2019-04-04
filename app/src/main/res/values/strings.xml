@@ -18,7 +18,7 @@
     <string name="earthquake_list_item_longitude">Longitude: %.3f</string>
     <string name="no_earthquakes_message">No earthquakes to display</string>
     <string name="earthquake_list_sort">Sort by:</string>
-    <string name="earthquake_detail_fragment_title">Earthquake Info</string>
+    <string name="earthquake_detail_fragment_title">Earthquake Info (S1715224)</string>
     <string name="earthquake_map_marker_title">%s - %.0fkm - %.1f</string>
     <string name="update_snackbar_question">Update?</string>
     <string name="search_earthquakes_message">Search for earthquakes within the selected range</string>
@@ -31,4 +31,6 @@
     <string name="search_location_hint">Enter location</string>
     <string name="earthquake_update_failed">Update earthquakes failed</string>
     <string name="earthquake_update_continue">Continue?</string>
+    <string name="student_id">S1715224</string>
+    <string name="search_results_title">Search results (S1715224)</string>
 </resources>

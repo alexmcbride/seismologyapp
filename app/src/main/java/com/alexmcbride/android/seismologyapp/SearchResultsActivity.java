@@ -53,7 +53,7 @@ public class SearchResultsActivity extends AppCompatActivity implements SearchLo
         }
 
         ActionBar actionbar = getSupportActionBar();
-        Objects.requireNonNull(actionbar).setTitle("Search results");
+        Objects.requireNonNull(actionbar).setTitle(R.string.search_results_title);
         actionbar.setDisplayHomeAsUpEnabled(true);
     }
 
