@@ -20,8 +20,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.alexmcbride.android.seismologyapp.model.Earthquake;
@@ -89,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements
         // Init timer stuff.
         mDownloadEarthquakesRunnable = new DownloadEarthquakesRunnable(this);
         startDownloadTask();
+
+//        List<Earthquake> earthquakes = Lists.newArrayList(new Earthquake(), new Earthquake(), new Earthquake());
+//        earthquakesUpdated(earthquakes);
     }
 
     @Override

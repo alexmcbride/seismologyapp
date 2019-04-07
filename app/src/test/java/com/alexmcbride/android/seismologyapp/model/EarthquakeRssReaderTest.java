@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
