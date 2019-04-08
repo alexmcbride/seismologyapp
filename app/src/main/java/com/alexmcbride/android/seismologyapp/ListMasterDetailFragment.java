@@ -5,6 +5,11 @@
 package com.alexmcbride.android.seismologyapp;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /*
  * Fragment to represent the earthquake list/detail view. In portrait only list is shown, in landscape
@@ -16,6 +21,17 @@ public class ListMasterDetailFragment extends MasterDetailFragment implements Ea
 
     public static ListMasterDetailFragment newInstance() {
         return new ListMasterDetailFragment();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        if (hasDetailsContainer()) {
+            updateDetailsContainer(EarthquakeDetailFragment.newInstance());
+        }
+
+        return view;
     }
 
     @Override

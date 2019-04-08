@@ -333,4 +333,16 @@ public class EarthquakeRepositoryInstrumentedTest {
         assertEquals("10", sdf.format(result1));
         assertEquals("20", sdf.format(result2));
     }
+
+    @Test
+    public void testGetFirstEarthquake() {
+        Earthquake earthquake1 = createEarthquake("Earthquake 1");
+        Earthquake earthquake2 = createEarthquake("Earthquake 2");
+        addEarthquakes(earthquake1, earthquake2);
+
+        Earthquake earthquake = mRepository.getFirstEarthquake();
+
+        assertNotNull(earthquake);
+        assertEquals("Earthquake 1", earthquake.getTitle());
+    }
 }

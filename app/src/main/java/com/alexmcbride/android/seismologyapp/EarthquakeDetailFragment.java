@@ -32,6 +32,10 @@ public class EarthquakeDetailFragment extends ChildFragment {
     private Earthquake mEarthquake;
     private MapView mMapView;
 
+    public static EarthquakeDetailFragment newInstance() {
+        return new EarthquakeDetailFragment();
+    }
+
     public static EarthquakeDetailFragment newInstance(long id) {
         EarthquakeDetailFragment fragment = new EarthquakeDetailFragment();
         Bundle args = new Bundle();
@@ -118,6 +122,8 @@ public class EarthquakeDetailFragment extends ChildFragment {
         if (args != null) {
             long id = args.getLong(ARG_EARTHQUAKE_ID, -1);
             mEarthquake = earthquakeRepository.getEarthquake(id);
+        } else {
+            mEarthquake = earthquakeRepository.getFirstEarthquake();
         }
     }
 

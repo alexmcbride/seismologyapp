@@ -131,6 +131,20 @@ public class EarthquakeRepository implements AutoCloseable {
         }
     }
 
+    public Earthquake getFirstEarthquake() {
+        try (SQLiteDatabase db = mDbHelper.getReadableDatabase();
+             Cursor cursor = db.query(EARTHQUAKES_TABLE, null,
+                     null, null, null,
+                     null, null, String.valueOf(1))) {
+            if (cursor.moveToFirst()) {
+                EarthquakeCursorWrapper cursorWrapper = new EarthquakeCursorWrapper(cursor);
+                return cursorWrapper.getEarthquake();
+            } else {
+                return null;
+            }
+        }
+    }
+
     public SearchResult getNorthernmostEarthquake(Date start, Date end) {
         return getSearchResult("Northernmost", "lat DESC", start, end);
     }
@@ -201,6 +215,7 @@ public class EarthquakeRepository implements AutoCloseable {
             }
         }
     }
+
 
     @Override
     public void close() {
