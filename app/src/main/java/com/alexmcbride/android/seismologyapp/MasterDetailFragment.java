@@ -49,10 +49,12 @@ public abstract class MasterDetailFragment extends Fragment {
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.containerMaster, masterFragment).commitNow();
 
-        // Tell master fragment to load its state.
-        // todo: need to figure out way to tell detail to load state, but not needed right now.
+        // Tell fragments to load their state.
         if (savedInstanceState != null) {
             masterFragment.loadSavedState(savedInstanceState);
+            if (mDetailsFragment != null) {
+                mDetailsFragment.loadSavedState(savedInstanceState);
+            }
         }
 
         // Details container will only exist when in portrait mode.
