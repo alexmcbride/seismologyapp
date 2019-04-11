@@ -73,6 +73,7 @@ public class EarthquakeRepositoryInstrumentedTest {
     private Earthquake createEarthquake(String title, Date pubDate, double depth, double magnitude) {
         Earthquake earthquake = new Earthquake();
         earthquake.setTitle(title);
+        earthquake.setLocation(title);
         earthquake.setPubDate(pubDate); // date can't be null
         earthquake.setDepth(depth);
         earthquake.setMagnitude(magnitude);
@@ -84,6 +85,7 @@ public class EarthquakeRepositoryInstrumentedTest {
         earthquake.setTitle(title);
         earthquake.setPubDate(new Date()); // date can't be null
         earthquake.setLocation(location);
+        earthquake.setLink("link-" + title);
         return earthquake;
     }
 
