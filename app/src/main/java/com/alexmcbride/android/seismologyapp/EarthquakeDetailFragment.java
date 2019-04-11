@@ -108,7 +108,9 @@ public class EarthquakeDetailFragment extends ChildFragment {
             mapViewBundle = new Bundle();
             outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle);
         }
-        mMapView.onSaveInstanceState(mapViewBundle);
+        if (mMapView != null) {
+            mMapView.onSaveInstanceState(mapViewBundle);
+        }
     }
 
     @Override
@@ -131,31 +133,41 @@ public class EarthquakeDetailFragment extends ChildFragment {
     public void onDestroy() {
         super.onDestroy();
         // We need to manually all these on the map view.
-        mMapView.onDestroy();
+        if (mMapView != null) {
+            mMapView.onDestroy();
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mMapView.onStart();
+        if (mMapView != null) {
+            mMapView.onStart();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mMapView.onStop();
+        if (mMapView != null) {
+            mMapView.onStop();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        if (mMapView != null) {
+            mMapView.onPause();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        if (mMapView != null) {
+            mMapView.onResume();
+        }
     }
 
     @Override

@@ -74,8 +74,8 @@ public class EarthquakeRepository implements AutoCloseable {
         return getEarthquakesInternal("pubDate " + getAscOrDesc(ascending));
     }
 
-    public List<Earthquake> getEarthquakesByTitle(boolean ascending) {
-        return getEarthquakesInternal("title " + getAscOrDesc(ascending));
+    public List<Earthquake> getEarthquakesByLocation(boolean ascending) {
+        return getEarthquakesInternal("location " + getAscOrDesc(ascending));
     }
 
     public List<Earthquake> getEarthquakesByDepth(boolean ascending) {

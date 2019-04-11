@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(ARG_SELECTED_PAGE, mViewPager.getCurrentItem());
-        editor.putBoolean(ARG_FIRST_RUN, false);
+        editor.putBoolean(ARG_FIRST_RUN, mFirstRun);
         editor.apply();
     }
 
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements
         // When first running don't bother to ask the user to update.
         if (mFirstRun) {
             listener.onClick(null);
+            mFirstRun = false;
         } else {
             // Dismiss if already showing a snackbar.
             if (mUpdateSnackbar != null && mUpdateSnackbar.isShown()) {

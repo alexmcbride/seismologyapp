@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -108,8 +110,15 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
             return true;
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // todo: make this modal, so user can click yes and repeat permission stuff
-                Toast.makeText(activity, R.string.location_permission_explanation, Toast.LENGTH_SHORT).show();
+                // Show explanation
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage( R.string.location_permission_explanation)
+                        .setPositiveButton(R.string.permission_explaination_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
             } else {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             }
@@ -158,7 +167,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         // Get spinner setting out of preferences.
         SharedPreferences preferences = getActivity().getPreferences(Activity.MODE_PRIVATE);
         mSpinnerOptions.setSelection(preferences.getInt(ARG_SELECTED_SORT_OPTION, 0));
-        mSpinnerDirection.setSelection(preferences.getInt(ARG_SELECTED_SORT_DIRECTION, 0));
+        mSpinnerDirection.setSelection(preferences.getInt(ARG_SELECTED_SORT_DIRECTION, 1));
         mLastLatitude = Double.longBitsToDouble(preferences.getLong(ARG_LAST_LATITUDE, 0));
         mLastLongitude = Double.longBitsToDouble(preferences.getLong(ARG_LAST_LONGITUDE, 0));
         mLocationSet = preferences.getBoolean(ARG_LOCATION_SET, false);
@@ -193,8 +202,12 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         Activity activity = Objects.requireNonNull(getActivity());
         SharedPreferences preferences = activity.getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerOptions.getSelectedItemPosition());
-        editor.putInt(ARG_SELECTED_SORT_DIRECTION, mSpinnerDirection.getSelectedItemPosition());
+        if (mSpinnerOptions != null) {
+            editor.putInt(ARG_SELECTED_SORT_OPTION, mSpinnerOptions.getSelectedItemPosition());
+        }
+        if (mSpinnerDirection != null) {
+            editor.putInt(ARG_SELECTED_SORT_DIRECTION, mSpinnerDirection.getSelectedItemPosition());
+        }
         editor.putLong(ARG_LAST_LATITUDE, Double.doubleToLongBits(mLastLatitude));
         editor.putLong(ARG_LAST_LONGITUDE, Double.doubleToLongBits(mLastLongitude));
         editor.putBoolean(ARG_LOCATION_SET, mLocationSet);
@@ -251,7 +264,7 @@ public class EarthquakeListFragment extends ChildFragment implements AdapterView
         } else if (sortOption.equalsIgnoreCase("date")) {
             return mEarthquakeRepository.getEarthquakesByDate(sortDirection);
         } else if (sortOption.equalsIgnoreCase("location")) {
-            return mEarthquakeRepository.getEarthquakesByTitle(sortDirection);
+            return mEarthquakeRepository.getEarthquakesByLocation(sortDirection);
         } else if (sortOption.equalsIgnoreCase("depth")) {
             return mEarthquakeRepository.getEarthquakesByDepth(sortDirection);
         } else if (sortOption.equalsIgnoreCase("magnitude")) {

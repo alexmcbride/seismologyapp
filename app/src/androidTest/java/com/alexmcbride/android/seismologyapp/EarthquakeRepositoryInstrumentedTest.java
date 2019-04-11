@@ -142,8 +142,8 @@ public class EarthquakeRepositoryInstrumentedTest {
         Earthquake earthquake2 = createEarthquake("Earthquake 2");
         addEarthquakes(earthquake1, earthquake2);
 
-        assertEarthquakesEqual(mRepository.getEarthquakesByTitle(true), earthquake1, earthquake2);
-        assertEarthquakesEqual(mRepository.getEarthquakesByTitle(false), earthquake2, earthquake1);
+        assertEarthquakesEqual(mRepository.getEarthquakesByLocation(true), earthquake1, earthquake2);
+        assertEarthquakesEqual(mRepository.getEarthquakesByLocation(false), earthquake2, earthquake1);
     }
 
     @Test

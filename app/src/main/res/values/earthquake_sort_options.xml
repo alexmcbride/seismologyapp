@@ -5,8 +5,8 @@
 -->
 <resources>
     <string-array name="earthquake_sort_options">
-        <item>Location</item>
         <item>Date</item>
+        <item>Location</item>
         <item>Nearest</item>
         <item>Depth</item>
         <item>Magnitude</item>
