@@ -25,7 +25,8 @@ public class EarthquakeRssReader {
     /*
      * Allows source of input stream to be overridden in unit tests
      */
-    protected InputStream getInputStream(URLConnection connection) throws IOException {
+    protected InputStream getInputStream(String url) throws IOException {
+        URLConnection connection = new URL(url).openConnection();
         return connection.getInputStream();
     }
 
@@ -33,8 +34,7 @@ public class EarthquakeRssReader {
      * Returns a list of earthquakes parsed from the URL feed.
      */
     public List<Earthquake> parse(String url) throws IOException, XmlPullParserException, ParseException {
-        URLConnection connection = new URL(url).openConnection();
-        try (InputStream source = getInputStream(connection)) {
+        try (InputStream source = getInputStream(url)) {
             return parseXml(source);
         }
     }

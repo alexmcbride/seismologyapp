@@ -79,7 +79,7 @@ public class EarthquakeRssReaderTest {
                 "</rss>\n";
 
         @Override
-        protected InputStream getInputStream(URLConnection connection) {
+        protected InputStream getInputStream(String url) {
             byte[] bytes = FAKE_EARTHQUAKES_XML.getBytes(StandardCharsets.UTF_8);
             return new ByteArrayInputStream(bytes);
         }
